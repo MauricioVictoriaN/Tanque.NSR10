@@ -1,0 +1,38 @@
+SPDX-License-Identifier: CC BY-NC-SA-4.0
+
+TANQUE.NSR10 LICENSE
+====================
+
+Copyright (c) 2026 Mauricio Javier Victoria Niño
+Independent Researcher, Cali, Colombia · hidratecsa@gmail.com · ORCID 0009-0003-4328-5691
+Public repository: https://github.com/MauricioVictoriaN/Tanque.NSR10
+
+This project is distributed under a TIERED license model; different components are governed by the following terms.
+
+------------------------------------------------------------------------
+1) ACCESSIBLE SOURCE  ->  CC BY-NC-SA 4.0  (public repository)
+------------------------------------------------------------------------
+Application/UI, documentation, examples, test data, the verification suite (822 assertions), the unit tests (144) and supporting tools.
+
+These are published in a public repository for free download and consultation. Terms: Attribution + NonCommercial + ShareAlike (CC BY-NC-SA 4.0). Any derivative work must keep the same license, attribute the author and must not be used for commercial purposes. Full text: https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+------------------------------------------------------------------------
+2) CALCULATION CORE (Tanque.Core)  ->  COMPILED / OBFUSCATED BINARY  · ACADEMIC EULA
+------------------------------------------------------------------------
+The calculation engine (algorithms, tabulated coefficients, bilinear interpolation) is distributed ONLY as a compiled, obfuscated binary protected by copyright.
+
+PROHIBITED:
+  · commercial use;
+  · reverse engineering, decompilation or extraction of the algorithms;
+  · modification, translation or creation of derivative works of the core.
+
+Permitted use: teaching, research and auditing of calculation methods, always with external verification (see the Disclaimer). The core source is made available to academic reviewers upon justified request.
+
+------------------------------------------------------------------------
+3) MANUSCRIPT / PREPRINT (engrXiv)  ->  CC BY 4.0
+------------------------------------------------------------------------
+The associated manuscript is published under CC BY 4.0 (attribution), for scientific dissemination and peer review.
+
+NO WARRANTY. The software is provided "AS IS", without warranties of any kind. See the Disclaimer of Warranty and Terms of Use (EULA) for details.
+
+Contact / requests for academic review of the core source: hidratecsa@gmail.com.
