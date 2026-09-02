@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Tanque.Core"><HintPath>..\..\libs\Tanque.Core.dll</HintPath></Reference>
+    <!-- Backlog v3, Fase A (2026-08-28): verifica tambien Tanque.Reportes (biblioteca nueva,
+         extraida de Tanque.App, ver hallazgo H3 del informe de auditoria externa del usuario). -->
+    <ProjectReference Include="..\..\src\Tanque.Reportes\Tanque.Reportes.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\casos_prueba\*.json" CopyToOutputDirectory="PreserveNewest" LinkBase="casos_prueba" />
+  </ItemGroup>
+
+</Project>

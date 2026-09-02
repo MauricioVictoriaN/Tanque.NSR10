@@ -1,0 +1,643 @@
+{
+  "id": "tabla_placa_biaxial",
+  "descripcion": "Tabla de coeficientes PCA/Marcus para placas rectangulares (deflexión y momento), extraída directamente del bytecode IL (CIL) del ejecutable compilado UD-TANQUES.exe mediante desensamblado con ikdasm. Aplica, de forma verificada como idéntica byte-exacta, tanto a la placa de cubierta (clase Analisis_placa, Formulario 7) como a la placa de cimentación (clase 'Análisis_Cimentacion', Formularios 10-11) -- confirma la sección 6 de Fase0_Especificacion_Normativa.docx.",
+  "fuente": {
+    "metodo": "Extracción de literales del bytecode IL (instrucciones ldc.r8/ldc.i4 seguidas de stelem.r8 o int32[,]::Set) dentro del método Button1_Click (Select Case r) de ambas clases.",
+    "archivos_IL": [
+      "/home/claude/il_dump/Analisis_placa.il (líneas 4626-8765, método Button1_Click)",
+      "/home/claude/il_dump/Analisis_Cimentacion.il (líneas 5737-10153, método Button1_Click)"
+    ],
+    "verificacion": "Los 10 conjuntos de Ca/Cdx/Cdy y los 2 conjuntos de Cmx/Cmy/Cmxy fueron extraídos de ambas clases de forma independiente y comparados programáticamente: son IDÉNTICOS byte-exacto entre Analisis_placa y Análisis_Cimentacion. Adicionalmente, Cdx(r=1.0) coincide exactamente (0.0,1.3,2.5,3.3,3.9,4.1) con el 'Coeficiente' de la Tabla 25 del ejercicio 1 del banco de pruebas de referencia (deflexiones de placa de fondo, b/a=1.00), confirmando de forma cruzada e independiente la corrección de esta extracción."
+  },
+  "convencion": {
+    "r": "r = b/a (relación de lados de la placa)",
+    "Ca": "2 valores -- pese al nombre 'Ca' (heredado de la variable del código), estos NO son coeficientes de deflexion: son los coeficientes de CORTANTE Cs del manual PCA (confirmado en la sesion 2026-08-24 releyendo la pagina 2-59 del manual: Ca(0)/Ca(1) coinciden exactamente con 'Bottom edge -- midpoint' y 'Side edge -- maximum' de la tabla Shear Coefficients Cs, no con ninguna tabla de deflexion). El nombre de la variable en el codigo original es enganoso; Tanque.Core debe llamarlo Cs, no Ca, para evitar propagar la confusion.",
+    "Cdx, Cdy": "6 valores cada uno: coeficientes de deflexión en 6 puntos a lo largo de cada eje (posiciones 0, 0.1a...0.5a según el eje)",
+    "Cmx, Cmy, Cmxy": "matrices 6x6 (índices [fila][columna], ambos 0-5) de coeficientes de momento Mx, My y el término cruzado Mxy, en una malla de posiciones 0.1a...0.9a/0.1b...0.9b -- tipo int32 en el código (ver advertencia de escala)",
+    "escala_Cmx_Cmy_Cmxy": "Los coeficientes de momento están almacenados como int32 en el código (a diferencia de Ca/Cdx/Cdy que son float64), consistente con la convención estándar del manual PCA 'Rectangular Concrete Tanks' de tabular los coeficientes de momento en MILÉSIMAS (el valor entero debe dividirse por 1000 antes de usarse en la fórmula Mx = Cmx x U x a^2)."
+  },
+  "ADVERTENCIA_CRITICA": "Los coeficientes de momento (Cmx, Cmy, Cmxy) SOLO se encontraron codificados en el bytecode para r=1.0 y r=0.75 -- de las otras 8 relaciones tabuladas por el programa (r=4, 3, 2.5, 2, 1.75, 1.5, 1.25, 0.5), el codigo NO asigna esos coeficientes en absoluto dentro del metodo Button1_Click -- ver Hallazgo 5 en Fase0_Especificacion_Normativa.docx (Anexo A). Ademas, de esos dos unicos r codificados, Cmy y Cmxy tienen el bug de hallazgo 6 (ver campo 'correccion_hallazgo_6_sesion_2026-08-24' arriba: el bloque r=1.0 en realidad contiene los valores de r=0.75) y Cmx del bloque r=1.0 tiene ademas la anomalia de dos digitos descrita en 'hallazgo_adicional_Cmx_r1_sesion_2026-08-24'. Los valores de Ca/Cs y Cdx/Cdy (cortante y deflexion) SI estan completos y verificados por doble lectura para los 10 valores de r -- ver referencia_normativa/pca_manual/coeficientes_caso3_muro_y_caso10_placa.json, que ahora contiene ademas las 3 matrices Mx/My/Mxy CONFIRMADAS (doble lectura) para los 10 valores de r tomadas directamente del manual, no del bytecode -- esa es la fuente que Tanque.Core debe usar para el modulo de placas, ignorando por completo lo que hace el bytecode para Cmx/Cmy/Cmxy.",
+  "tablas": {
+    "4.0": {
+      "Ca": [
+        0.5,
+        0.37
+      ],
+      "Cdx": [
+        0.0,
+        7.0,
+        10.6,
+        12.1,
+        12.7,
+        12.8
+      ],
+      "Cdy": [
+        0.0,
+        4.0,
+        7.6,
+        10.4,
+        12.2,
+        12.8
+      ],
+      "Cmx_Cmy_Cmxy_disponibles": false,
+      "nota": "No codificados en el bytecode para este r -- ver ADVERTENCIA_CRITICA arriba."
+    },
+    "3.0": {
+      "Ca": [
+        0.49,
+        0.37
+      ],
+      "Cdx": [
+        0.0,
+        5.5,
+        9.1,
+        11.1,
+        12.0,
+        12.2
+      ],
+      "Cdy": [
+        0.0,
+        3.8,
+        7.3,
+        9.9,
+        11.6,
+        12.2
+      ],
+      "Cmx_Cmy_Cmxy_disponibles": false,
+      "nota": "No codificados en el bytecode para este r -- ver ADVERTENCIA_CRITICA arriba."
+    },
+    "2.5": {
+      "Ca": [
+        0.48,
+        0.37
+      ],
+      "Cdx": [
+        0.0,
+        4.7,
+        8.1,
+        10.1,
+        11.2,
+        11.5
+      ],
+      "Cdy": [
+        0.0,
+        3.6,
+        6.8,
+        9.4,
+        10.9,
+        11.5
+      ],
+      "Cmx_Cmy_Cmxy_disponibles": false,
+      "nota": "No codificados en el bytecode para este r -- ver ADVERTENCIA_CRITICA arriba."
+    },
+    "2.0": {
+      "Ca": [
+        0.46,
+        0.37
+      ],
+      "Cdx": [
+        0.0,
+        3.8,
+        6.7,
+        8.7,
+        9.8,
+        10.1
+      ],
+      "Cdy": [
+        0.0,
+        3.2,
+        6.0,
+        8.2,
+        9.6,
+        10.1
+      ],
+      "Cmx_Cmy_Cmxy_disponibles": false,
+      "nota": "No codificados en el bytecode para este r -- ver ADVERTENCIA_CRITICA arriba."
+    },
+    "1.75": {
+      "Ca": [
+        0.45,
+        0.37
+      ],
+      "Cdx": [
+        0.0,
+        3.2,
+        5.8,
+        7.7,
+        8.7,
+        9.1
+      ],
+      "Cdy": [
+        0.0,
+        2.9,
+        5.4,
+        7.4,
+        8.7,
+        9.1
+      ],
+      "Cmx_Cmy_Cmxy_disponibles": false,
+      "nota": "No codificados en el bytecode para este r -- ver ADVERTENCIA_CRITICA arriba."
+    },
+    "1.5": {
+      "Ca": [
+        0.42,
+        0.36
+      ],
+      "Cdx": [
+        0.0,
+        2.6,
+        4.9,
+        6.5,
+        7.4,
+        7.7
+      ],
+      "Cdy": [
+        0.0,
+        2.5,
+        4.6,
+        6.3,
+        7.4,
+        7.7
+      ],
+      "Cmx_Cmy_Cmxy_disponibles": false,
+      "nota": "No codificados en el bytecode para este r -- ver ADVERTENCIA_CRITICA arriba."
+    },
+    "1.25": {
+      "Ca": [
+        0.39,
+        0.36
+      ],
+      "Cdx": [
+        0.0,
+        2.0,
+        3.7,
+        5.0,
+        5.8,
+        6.0
+      ],
+      "Cdy": [
+        0.0,
+        1.9,
+        3.6,
+        4.9,
+        5.7,
+        6.0
+      ],
+      "Cmx_Cmy_Cmxy_disponibles": false,
+      "nota": "No codificados en el bytecode para este r -- ver ADVERTENCIA_CRITICA arriba."
+    },
+    "1.0": {
+      "Ca": [
+        0.34,
+        0.34
+      ],
+      "Cdx": [
+        0.0,
+        1.3,
+        2.5,
+        3.3,
+        3.9,
+        4.1
+      ],
+      "Cdy": [
+        0.0,
+        1.3,
+        2.5,
+        3.3,
+        3.9,
+        4.1
+      ],
+      "Cmx": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          8,
+          13,
+          17,
+          19,
+          20
+        ],
+        [
+          0,
+          12,
+          21,
+          27,
+          31,
+          32
+        ],
+        [
+          0,
+          14,
+          25,
+          33,
+          38,
+          39
+        ],
+        [
+          0,
+          15,
+          27,
+          36,
+          41,
+          43
+        ],
+        [
+          0,
+          15,
+          28,
+          37,
+          42,
+          44
+        ]
+      ],
+      "Cmy": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          6,
+          10,
+          12,
+          13,
+          14
+        ],
+        [
+          0,
+          11,
+          17,
+          21,
+          24,
+          24
+        ],
+        [
+          0,
+          13,
+          22,
+          28,
+          31,
+          32
+        ],
+        [
+          0,
+          15,
+          25,
+          32,
+          36,
+          37
+        ],
+        [
+          0,
+          15,
+          26,
+          33,
+          37,
+          38
+        ]
+      ],
+      "Cmxy": [
+        [
+          26,
+          24,
+          19,
+          14,
+          7,
+          0
+        ],
+        [
+          23,
+          22,
+          18,
+          13,
+          7,
+          0
+        ],
+        [
+          18,
+          17,
+          14,
+          10,
+          5,
+          0
+        ],
+        [
+          12,
+          12,
+          10,
+          7,
+          4,
+          0
+        ],
+        [
+          6,
+          6,
+          5,
+          4,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "Cmx_Cmy_Cmxy_disponibles": true
+    },
+    "0.75": {
+      "Ca": [
+        0.27,
+        0.3
+      ],
+      "Cdx": [
+        0.0,
+        0.7,
+        1.3,
+        1.7,
+        2.0,
+        2.1
+      ],
+      "Cdy": [
+        0.0,
+        0.7,
+        1.3,
+        1.7,
+        2.0,
+        2.1
+      ],
+      "Cmx": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          5,
+          9,
+          11,
+          12,
+          13
+        ],
+        [
+          0,
+          7,
+          13,
+          17,
+          19,
+          20
+        ],
+        [
+          0,
+          8,
+          15,
+          19,
+          22,
+          23
+        ],
+        [
+          0,
+          8,
+          15,
+          20,
+          23,
+          25
+        ],
+        [
+          0,
+          8,
+          15,
+          21,
+          24,
+          25
+        ]
+      ],
+      "Cmy": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          6,
+          10,
+          12,
+          13,
+          14
+        ],
+        [
+          0,
+          11,
+          17,
+          21,
+          24,
+          24
+        ],
+        [
+          0,
+          13,
+          22,
+          28,
+          31,
+          32
+        ],
+        [
+          0,
+          15,
+          25,
+          32,
+          36,
+          37
+        ],
+        [
+          0,
+          15,
+          26,
+          33,
+          37,
+          38
+        ]
+      ],
+      "Cmxy": [
+        [
+          26,
+          24,
+          19,
+          14,
+          7,
+          0
+        ],
+        [
+          23,
+          22,
+          18,
+          13,
+          7,
+          0
+        ],
+        [
+          18,
+          17,
+          14,
+          10,
+          5,
+          0
+        ],
+        [
+          12,
+          12,
+          10,
+          7,
+          4,
+          0
+        ],
+        [
+          6,
+          6,
+          5,
+          4,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "Cmx_Cmy_Cmxy_disponibles": true
+    },
+    "0.5": {
+      "Ca": [
+        0.18,
+        0.23
+      ],
+      "Cdx": [
+        0.0,
+        0.2,
+        0.4,
+        0.5,
+        0.6,
+        0.6
+      ],
+      "Cdy": [
+        0.0,
+        0.2,
+        0.4,
+        0.5,
+        0.6,
+        0.6
+      ],
+      "Cmx_Cmy_Cmxy_disponibles": false,
+      "nota": "No codificados en el bytecode para este r -- ver ADVERTENCIA_CRITICA arriba."
+    }
+  },
+  "correccion_hallazgo_6_sesion_2026-08-24": "El Hallazgo 6 de Fase0_Especificacion_Normativa.docx describia la direccion de este bug al reves. Redaccion anterior: 'para r=0.75, las matrices Cmy y Cmxy son copia byte-exacta de las de r=1.0' (implicando que el bloque r=1.0 tiene los valores CORRECTOS y el de r=0.75 los copio mal). La relectura de esta sesion, pagina por pagina del manual PCA (paginas 2-63 y 2-64), confirma que es AL REVES: las matrices Cmy y Cmxy que el bloque 'r=1.0' del bytecode realmente calcula coinciden EXACTAMENTE con las publicadas en el manual para r=0.75 (no para r=1.0) -- es decir, el bloque 'r=1.0' es el que tiene los valores equivocados (los de r=0.75 copiados), mientras que el bloque 'r=0.75' SI tiene sus propios valores correctos de Cmy/Cmxy. Confirmado con doble fuente: (a) extraccion fresca de literales IL de ambos bloques (Button1_Click de Analisis_placa, bloque r=1.0 en IL_071d-IL_125e, bloque r=0.75 en IL_1263-IL_1984), que producen matrices Cmy/Cmxy IDENTICAS byte-exacto entre ambos bloques; (b) esa matriz compartida coincide digito a digito con la Tabla de la pagina 2-64 (r=0.75) del manual, NO con la de la pagina 2-63 (r=1.0). Cmx SI difiere entre ambos bloques (no esta afectado por este copy-paste) -- ver el hallazgo adicional siguiente sobre Cmx. Esta correccion es puramente de redaccion/direccion del hallazgo: no cambia la accion de Tanque.Core, que ya estaba decidida a usar los coeficientes del manual PCA para cada r de forma independiente (nunca los valores del bytecode original), por lo que este bug del programa original no se hereda de ningun modo.",
+  "hallazgo_adicional_Cmx_r1_sesion_2026-08-24": "Ademas del hallazgo 6 (Cmy/Cmxy), se detecto en esta sesion una segunda anomalia, mas pequena e independiente, en Cmx del bloque r=1.0: el bytecode fija Cmx[5][2]=28 y Cmx[5][3]=37 (fila 0.5a, columnas 0.2b/0.3b -- confirmado byte-exacto en IL_09f7 e IL_0a06), mientras que el manual PCA publica en esa misma celda 27 y 38 respectivamente (pagina 2-63, tabla Mx, b/a=1.0, fila 0.5a) -- los dos digitos parecen transpuestos. Confianza moderada (una sola relectura de la imagen, no la doble lectura completa que se aplico al resto de la tabla); no bloquea nada porque, igual que con el hallazgo 6, Tanque.Core usara el valor del manual (27, 38), no el del bytecode original, para cualquier r.",
+  "pendiente_mecanismo_marcus_sesion_2026-08-24": {
+    "valor_original": "Se identifico en esta sesion (sin terminar de decodificar) un mecanismo adicional en el bytecode, posterior a la seleccion de Cmx/Cmy/Cmxy por r (a partir de IL_1a87 en Analisis_placa): el codigo construye dos matrices int32[6,6] nuevas combinando Cmx+Cmxy y, por separado, Cmy+Cmxy celda a celda, acotando el resultado en 0 cuando la suma es negativa (patron 'Set(i,j, max(0, Cmx[i,j]+Cmxy[i,j]))', repetido con variantes -- se contaron 4 llamadas a newobj de matrices int32[6,6] en esa zona del metodo, sugiriendo mas de una combinacion/variante, posiblemente para distintas caras o el metodo de superposicion de Marcus). Antes de implementar el modulo de placas (F.7, 10-11), un futuro paso debe terminar de decodificar este mecanismo completo (las 4 matrices, que corrigen o usan cada una, y como se combinan con Ca/Cs, Cdx/Cdy y U/a/DD para producir los resultados finales del formulario) -- no se hizo en esta sesion por límite de alcance, pero es indispensable antes de escribir PlacasRectangulares.cs porque afecta directamente los momentos de diseno finales.",
+    "RESUELTO_sesion_2026-08-24_continuacion": "Ver campo 'mecanismo_marcus_DECODIFICADO_sesion_2026-08-24' para la decodificacion completa y el hallazgo 11."
+  },
+  "mecanismo_marcus_DECODIFICADO_sesion_2026-08-24": {
+    "estado": "Decodificacion completa. Reemplaza el campo 'pendiente_mecanismo_marcus_sesion_2026-08-24' (se deja abajo con una nota de resuelto, no se borra, para preservar el historial).",
+    "descripcion": "IL de Analisis_placa::Button1_Click, tramo IL_1a87 al ret final (linea 4137 de Button1_Click_placa.il). Construye 4 matrices int32[6,6] a partir de Cmx/Cmy/Cmxy (convencion fila=0..5 TOP..0.5a, columna=0..5 END..0.5b, igual que este archivo): Mx_pos[i,j]=max(0,Cmx[i,j]+Cmxy[i,j]); Mx_neg[i,j]=max(0,Cmx[i,j]-Cmxy[i,j]); My_pos[i,j]=max(0,Cmy[i,j]+Cmxy[i,j]); My_neg[i,j]=max(0,Cmy[i,j]-Cmxy[i,j]). Los 4 campos completos (36 celdas c/u) se escalan x U x a^2 / 1000 (redondeado a 2 decimales) y se muestran integros en las grillas D4 (Mx_pos), D5 (Mx_neg), D6 (My_pos), D7 (My_neg) de la interfaz.",
+    "hallazgo_11_celda_fija_no_es_el_maximo": {
+      "descripcion": "El diseno automatico (TMua1/TMub1, que alimentan el modulo de flexion F.12-14) NUNCA busca el maximo del campo: lee siempre Mx_pos[2,2] y My_pos[5,4], celdas fijas, sin importar r. Los campos 'negativos' (Mx_neg/My_neg) se calculan y se muestran en pantalla pero jamas se leen para el diseno automatico.",
+      "verificacion_por_recalculo": {
+        "r_1.00": {
+          "Mx_pos_maximo_real": {
+            "valor": 44,
+            "celda": [
+              4,
+              4
+            ]
+          },
+          "Mx_pos_que_usa_el_programa": {
+            "valor": 42,
+            "celda": [
+              2,
+              2
+            ]
+          },
+          "subdiseno_relativo": "~4.5%",
+          "My_pos_maximo_real": {
+            "valor": 44,
+            "celda": [
+              4,
+              4
+            ]
+          },
+          "My_pos_que_usa_el_programa": {
+            "valor": 43,
+            "celda": [
+              5,
+              4
+            ]
+          },
+          "subdiseno_relativo_My": "~2.3%"
+        },
+        "r_0.75": {
+          "Mx_pos_maximo_real": {
+            "valor": 27,
+            "celda": [
+              1,
+              1
+            ]
+          },
+          "Mx_pos_que_usa_el_programa": {
+            "valor": 27,
+            "celda": [
+              2,
+              2
+            ]
+          },
+          "subdiseno_relativo": "0% (coincidencia, no regla general)",
+          "My_pos_maximo_real": {
+            "valor": 26,
+            "celda": [
+              0,
+              0
+            ]
+          },
+          "My_pos_que_usa_el_programa": {
+            "valor": 24,
+            "celda": [
+              5,
+              4
+            ]
+          },
+          "subdiseno_relativo_My": "~7.7%"
+        }
+      },
+      "severidad": "Alta -- subdiseno real de cuantia de flexion, no solo cobertura de r (hallazgo 5).",
+      "correccion_obligatoria_Tanque_Core": "PlacasRectangulares.cs debe calcular el campo completo de las 4 matrices y tomar max(Mx_pos, Mx_neg) en x y max(My_pos, My_neg) en y sobre las 36 celdas como momento gobernante -- nunca una celda fija."
+    },
+    "cortantes_TVua1_TVub1_sin_problema": "TVua1/TVub1 se toman de Ca[0]/Ca[1] (coeficientes de cortante Cs del manual PCA) escalados x U x a -- sin combinacion ni celda fija, no hay hallazgo aqui.",
+    "ya_no_bloquea_la_implementacion": true
+  }
+}

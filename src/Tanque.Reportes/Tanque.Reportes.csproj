@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!--
+    Backlog v3, Fase A (2026-08-28, hallazgo H3 del informe de auditoria externa del usuario: el
+    formateador de reportes vivia en Tanque.App, acoplado a la UI, en vez de ser una biblioteca
+    independiente. Biblioteca pura de formato de texto (sin ninguna referencia a Avalonia ni a
+    ningun framework de UI) que toma el resultado agregado de Tanque.Core.Modulos.CalculadorTanque y
+    produce el reporte de calculo como texto plano de ancho fijo, el mismo contenido, caracter por
+    caracter, que antes producia Tanque.App.ReporteResultados + MainWindow.EjecutarCalculo juntos.
+    100% verificable en el sandbox de la nube (a diferencia de Tanque.App), lo que ademas la deja
+    lista como base para Fase C (reportes Markdown/HTML/PDF) sin volver a tocar Tanque.App.
+  -->
+  <ItemGroup>
+    <Reference Include="Tanque.Core"><HintPath>..\..\libs\Tanque.Core.dll</HintPath></Reference>
+  </ItemGroup>
+
+</Project>

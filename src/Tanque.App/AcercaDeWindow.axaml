@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Tanque.App.AcercaDeWindow"
+        Title="Acerca de / Aviso legal — Tanque.NSR10"
+        Width="900" Height="660"
+        MinWidth="640" MinHeight="460"
+        WindowStartupLocation="CenterOwner"
+        RequestedThemeVariant="Light"
+        Background="White">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="20">
+
+    <!-- Cabecera del diálogo -->
+    <StackPanel Spacing="4">
+      <TextBlock Text="Acerca de / Aviso legal" FontSize="18" FontWeight="Bold" Foreground="#1D4ED8"/>
+      <TextBlock Name="TxtAcercaDe" FontSize="13" Foreground="#334155" TextWrapping="Wrap"/>
+    </StackPanel>
+
+    <!-- Cuerpo: aviso legal (descargo + EULA) -->
+    <ScrollViewer Grid.Row="1" Margin="0,14,0,0">
+      <StackPanel Spacing="8">
+        <TextBlock Name="TxtTitulo" FontSize="15" FontWeight="Bold" Foreground="#0F172A" TextWrapping="Wrap"/>
+        <TextBlock Name="TxtDescargo" FontSize="14" Foreground="#1F2937" TextWrapping="Wrap" LineHeight="22"/>
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- Pie -->
+    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,14,0,0"
+                HorizontalAlignment="Right">
+      <Button Content="Aceptar" Padding="18,7" Click="BtnAceptar_Click"/>
+    </StackPanel>
+
+  </Grid>
+</Window>

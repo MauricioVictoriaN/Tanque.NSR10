@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <!--
+    NOTA: igual que el proyecto de pruebas xUnit, este proyecto requiere acceso a nuget.org para
+    restaurar los paquetes de Avalonia. NO se pudo compilar ni ejecutar en ninguna sesión en la
+    nube hasta ahora (nuget.org bloqueado por la lista blanca de red del sandbox, confirmado de
+    nuevo el 2026-08-25 con "dotnet restore": NU1301, proxy 403). Restaurar y correr normalmente
+    en un equipo con acceso a NuGet: dotnet run.
+
+    Desde el 2026-08-25 esta ya NO es una ventana vacía: MainWindow.axaml/.axaml.cs implementa una
+    interfaz mínima (sin ViewModel, sin data binding, sin persistencia de proyectos ni generación
+    de PDF, ver el docstring de MainWindow) que expone los once módulos de Tanque.Core (ocho de
+    cálculo + tres de integración) ya verificados por tools/Tanque.Core.Verificacion.
+
+    Backlog v3, Fase A (2026-08-28, hallazgos H1/H3 del informe de auditoría externa del usuario):
+    MainWindow.EjecutarCalculo ya NO orquesta los módulos de cálculo ni formatea el reporte
+    directamente: delega a Tanque.Core.Modulos.CalculadorTanque (nueva fachada, en Tanque.Core,
+    referenciado más abajo) y a Tanque.Reportes.ReporteResultados.GenerarReporte (biblioteca nueva,
+    reemplaza al antiguo Tanque.App.ReporteResultados.cs; ese archivo se dejó vacío en vez de
+    eliminarse, ver su propio comentario). Extracción mecánica, verificada carácter por carácter
+    contra el reporte que producía el código anterior en tools/Tanque.Core.Verificacion (módulo 12).
+
+    PENDIENTE EXPLÍCITO de la próxima sesión con acceso al entorno del usuario: restaurar/compilar/
+    ejecutar esto por primera vez (dotnet run) y corregir cualquier error de compilación o de
+    binding de nombres de controles Avalonia que el sandbox de la nube no pudo detectar; incluida
+    la extracción de Fase A (nueva ProjectReference a Tanque.Reportes, más abajo), que el sandbox sí
+    pudo compilar y verificar (Tanque.Core + Tanque.Reportes no dependen de Avalonia), pero
+    MainWindow.axaml.cs en sí mismo, al depender de los controles Avalonia generados por el XAML,
+    sigue sin poder compilarse fuera de un equipo con NuGet real. Ver
+    claude/ruta-trabajo-proximas-sesiones.md.
+  -->
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.1.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.1.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.1.3" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.1.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Tanque.Core"><HintPath>..\..\libs\Tanque.Core.dll</HintPath></Reference>
+    <!-- Backlog v3, Fase A (2026-08-28): biblioteca de formato de reportes, extraída de este
+         proyecto (hallazgo H3); ver src\Tanque.Reportes\Tanque.Reportes.csproj. -->
+    <ProjectReference Include="..\Tanque.Reportes\Tanque.Reportes.csproj" />
+  </ItemGroup>
+
+</Project>

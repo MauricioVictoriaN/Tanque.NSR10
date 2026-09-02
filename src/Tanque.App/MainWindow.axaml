@@ -1,0 +1,211 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Tanque.App.MainWindow"
+        Title="Tanque.Core -- Diseño estructural de tanques en concreto reforzado"
+        Width="980" Height="720"
+        MinWidth="720" MinHeight="480">
+  <Grid RowDefinitions="Auto,*,Auto">
+
+    <!-- Encabezado -->
+    <Border Grid.Row="0" Padding="16,12" Background="#1F2937">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="2">
+        <TextBlock Text="Tanque.Core" FontSize="20" FontWeight="Bold" Foreground="White"/>
+        <TextBlock Text="Diseño estructural de tanques rectangulares de concreto reforzado -- NSR-10 / ACI 350. Exposición de los módulos de cálculo (geometría, presiones, sismo, placas, muros y diseño de refuerzo)."
+                   Foreground="#D1D5DB" TextWrapping="Wrap" FontSize="12"/>
+        <!-- Fase 1 del frente de interfaz (2026-08-30): banner de veredicto global CUMPLE/NO CUMPLE.
+             Oculto por defecto; MostrarVeredicto() lo rellena y lo muestra tras cada cálculo. -->
+        <Border Name="BannerVeredictoBorder" Margin="0,8,0,0" Padding="12,8" CornerRadius="4"
+                Background="#374151" IsVisible="False">
+          <TextBlock Name="BannerVeredicto" Foreground="White" FontWeight="Bold" FontSize="13" TextWrapping="Wrap"/>
+        </Border>
+        </StackPanel>
+        <Button Grid.Column="1" Name="BtnAcercaDe" Content="Ayuda / Acerca de..." Padding="10,6"
+                VerticalAlignment="Top" Margin="12,0,0,0" Click="BtnAcercaDe_Click"/>
+      </Grid>
+    </Border>
+
+    <!-- Cuerpo: datos de entrada / resultados. Backlog v3, Fase B (2026-08-28, decidida por el
+         usuario): ambas pestañas se reorganizaron en secciones plegables (Expander) por grupo,
+         siguiendo la misma taxonomía "GRUPOS" (sismo, hidrostático, tierras, dinámico, envolventes,
+         diseño de muros, diseño de losas, armaduras) que el informe externo de auditoría identificó
+         en el manual del programa de referencia comercial "Módulo Tanques"; sin rehacer la
+         navegación de 2 pestañas ni introducir ViewModel/data binding. Los x:Name de todos los
+         controles de "Datos de entrada" NO cambiaron respecto a la versión anterior (solo se
+         reordenaron dentro de Expander en vez de bajo un TextBlock en negrita); Leer()/EjecutarCalculo()
+         en el code-behind no requirió ningún cambio por eso. -->
+    <TabControl Grid.Row="1" Name="TabPrincipal" Margin="8">
+
+      <TabItem Header="Datos de entrada">
+        <ScrollViewer>
+          <StackPanel Margin="12" Spacing="8" MaxWidth="820" HorizontalAlignment="Left">
+
+            <!-- Identidad del desarrollador (autoría del programa): misma fuente única
+                 IdentidadDesarrollador que usan todos los reportes. Solo presentación, sin
+                 efecto en el cálculo. -->
+            <Border Background="#EEF2FF" BorderBrush="#C7D2FE" BorderThickness="1"
+                    CornerRadius="4" Padding="10,6">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Desarrollador / Autor del programa" FontWeight="Bold" FontSize="12" Foreground="#1E40AF"/>
+                <TextBlock x:Name="DevNombre" FontWeight="Bold" FontSize="13" Foreground="#1F2937"/>
+                <TextBlock x:Name="DevInfo" FontSize="11" Foreground="#475569" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+
+            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,4">
+              <Button Name="BtnExpandirTodo" Content="Expandir todo" Padding="10,4" Click="BtnExpandirTodo_Click"/>
+              <Button Name="BtnColapsarTodo" Content="Colapsar todo" Padding="10,4" Click="BtnColapsarTodo_Click"/>
+              <Button Name="BtnAcercaDeEntrada" Content="Acerca de..." Padding="10,4" Click="BtnAcercaDe_Click"/>
+            </StackPanel>
+
+            <Expander Header="Geometría y tipo de tanque (Formulario 2)" IsExpanded="True" x:Name="ExpGeometria">
+              <StackPanel Margin="8,8,0,4" Spacing="6">
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="B -- ancho del tanque, m" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtB" Text="6.0" ToolTip.Tip="Ancho EXTERIOR del tanque en planta (cara exterior a cara exterior de los muros; dirección corta), m. El claro interior es B-2·em. Interviene en las razones r=B/L (placa) y r=B/Hm (muro transversal, condición exterior) de las tablas PCA, válidas solo para r en [0.5, 4.0]."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="L -- largo del tanque, m" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtL" Text="8.0" ToolTip.Tip="Largo EXTERIOR del tanque en planta (cara exterior a cara exterior de los muros; dirección larga), m. El claro interior es L-2·em. Interviene en r=L/B (placa) y r=L/Hm (muro longitudinal, condición exterior) de las tablas PCA, válidas solo para r en [0.5, 4.0]."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="Ht -- altura total del muro, m" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtHt" Text="4.50" ToolTip.Tip="Altura total EXTERIOR del tanque, m: desde la cara externa (inferior) de la losa de fondo hasta la cara externa (superior) de la losa de tapa. Incluye los espesores de fondo (ef) y tapa (et); la altura interior libre del muro es Ht-ef-et."/></Grid>
+                <CheckBox Name="ChkConTapa" Content="El tanque tiene placa de cubierta (tapa)" IsChecked="True" ToolTip.Tip="Si está marcada, se calcula el diseño de la placa de cubierta (Formulario 7); si no, se omite ese cálculo y no se lee el espesor et."/>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="em -- espesor de muro, m" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtEm" Text="0.30" ToolTip.Tip="Espesor del muro, m. Se verifica además contra el espesor mínimo de NSR-10 C.23-C.14.6, independientemente del resultado de diseño a flexión/cortante."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="ef -- espesor de placa de fondo, m" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtEf" Text="0.35" ToolTip.Tip="Espesor de la placa de fondo, m."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="et -- espesor de placa de cubierta, m (0 si no tiene tapa)" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtEt" Text="0.20" ToolTip.Tip="Espesor de la placa de cubierta, m. Solo se usa si el tanque tiene tapa (casilla de arriba); use 0 si no aplica."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="HL -- altura de la lámina de líquido, m" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtHL" Text="4.00" ToolTip.Tip="Altura de la lámina de líquido dentro del tanque, m, medida desde la cara INTERNA de la losa de fondo (el líquido está dentro; límite físico HL ≤ Ht-ef-et; la validación acepta hasta Ht por compatibilidad con los fixtures de la tesis). Alimenta la presión hidrostática (Formulario 4) y la fuerza sísmica hidrodinámica (Formulario 5)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="Hm -- altura de suelo sobre el muro, m (0 para Superficial; mayor que 0 para Enterrado; la condición exterior usa r=b/Hm, debe caer en [0.5, 4.0])" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtHm" Text="2.50" ToolTip.Tip="Altura de suelo/relleno contra la cara exterior del muro, m, medida desde la cara externa (inferior) de la losa de fondo hasta la superficie del terreno. Use 0 si el tanque no tiene relleno lateral (tipo Superficial); debe ser mayor que 0 si está Enterrado. Define r=b/Hm en la condición exterior de muro, que debe caer en [0.5, 4.0]. Alimenta la presión de tierras (Formulario 4) y la fuerza dinámica de suelo (Formulario 6)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="Wext -- sobrecarga en superficie del terreno, kN/m²" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtWext" Text="0.00" ToolTip.Tip="Sobrecarga en la superficie del terreno junto al muro (tráfico, equipos, etc.), kN/m². Use 0 si no aplica."/></Grid>
+
+                <Grid ColumnDefinitions="240,*" Margin="0,2">
+                  <TextBlock Text="Tipo de tanque" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                  <ComboBox Grid.Column="1" Name="CmbTipoTanque" SelectedIndex="1" ToolTip.Tip="Determina qué estados de carga se envuelven en la placa de fondo y si se activa la verificación de flotabilidad (ACI 350.4R-04 §3.1.2). &quot;Enterrado con nivel freático&quot; habilita el campo siguiente y el chequeo de subpresión.">
+                    <ComboBoxItem Content="Superficial (sin relleno de suelo contra el muro, Hm debe ser 0)"/>
+                    <ComboBoxItem Content="Enterrado, sin nivel freático"/>
+                    <ComboBoxItem Content="Enterrado, con nivel freático (activa verificación de flotabilidad)"/>
+                  </ComboBox>
+                </Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="Altura del nivel freático desde el fondo, m (solo si Tipo=Enterrado con nivel freático)" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtAlturaNivelFreatico" Text="1.00" ToolTip.Tip="Altura de la columna de agua freática medida desde la cara externa (inferior) de la losa de fondo, m (la base exterior; la subpresión empuja sobre esa cara). Solo se usa cuando Tipo = &quot;Enterrado, con nivel freático&quot;. Debe cumplir 0 &lt; h_nf ≤ Hm."/></Grid>
+              </StackPanel>
+            </Expander>
+
+            <Expander Header="Materiales" IsExpanded="True" x:Name="ExpMateriales">
+              <StackPanel Margin="8,8,0,4" Spacing="6">
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="f'c -- resistencia del concreto, MPa" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtFc" Text="21" ToolTip.Tip="Resistencia a la compresión del concreto f'c, MPa (típico 21-28 MPa para tanques)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="fy -- fluencia del acero, MPa" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtFy" Text="420" ToolTip.Tip="Esfuerzo de fluencia del acero de refuerzo fy, MPa (típico 420 MPa, PDR-60/grado 60)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="γsuelo, kN/m³" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtGammaSuelo" Text="18.0" ToolTip.Tip="Peso unitario del suelo (seco/húmedo, sin saturar), kN/m³ (típico 16-19 kN/m³). Usado tanto en tierras (presión estática) como en sismo dinámico de suelo."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="γsuelo,sat -- peso unitario saturado del suelo, kN/m³ (opcional; solo para el sobreancho automático de flotabilidad -- dejar en blanco si no aplica)" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtGammaSueloSaturado" Text="" ToolTip.Tip="Peso unitario del suelo SATURADO, kN/m³ (opcional). Solo se usa para el cálculo automático de sobreancho de losa de fondo cuando la verificación de flotabilidad no cumple; déjelo en blanco si no lo necesita."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="γconcreto, kN/m³" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtGammaConcreto" Text="24.0" ToolTip.Tip="Peso unitario del concreto reforzado, kN/m³ (típico 24 kN/m³)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="γlíquido, kN/m³ (9.81 para agua)" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtGammaLiquido" Text="9.81" ToolTip.Tip="Peso unitario del líquido almacenado, kN/m³ (9.81 kN/m³ para agua). Usado tanto en la presión hidrostática como en el peso sísmico impulsivo/convectivo (Housner)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="φ -- ángulo de fricción del suelo, grados" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtPhi" Text="30" ToolTip.Tip="Ángulo de fricción interna del suelo φ, grados. Se usa en el coeficiente de Rankine (presiones laterales, tierras) y en Mononobe-Okabe (fuerza dinámica de suelo)."/></Grid>
+              </StackPanel>
+            </Expander>
+
+            <Expander Header="Cargas de cubierta y fondo (alimentan el diseño de losas y sus envolventes)" IsExpanded="True" x:Name="ExpCargas">
+              <StackPanel Margin="8,8,0,4" Spacing="6">
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="CV -- carga viva de cubierta, kN/m²" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtCvCubierta" Text="0.50" ToolTip.Tip="Carga viva sobre la placa de cubierta, kN/m² (solo se usa si el tanque tiene tapa)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="CG -- carga adicional de cubierta, kN/m²" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtCgCubierta" Text="0.00" ToolTip.Tip="Carga adicional/granizo u otra sobrecarga de servicio sobre la cubierta, kN/m² (solo se usa si el tanque tiene tapa)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="CV -- carga viva sobre placa de fondo, kN/m²" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtCvFondo" Text="0.00" ToolTip.Tip="Carga viva sobre la placa de fondo, kN/m² (equipos, acabados, etc. -- use 0 si no aplica)."/></Grid>
+              </StackPanel>
+            </Expander>
+
+            <Expander Header="Sismo -- espectro de diseño (NSR-10 Título A / Formulario 5)" IsExpanded="True" x:Name="ExpSismo">
+              <StackPanel Margin="8,8,0,4" Spacing="6">
+                <CheckBox Name="ChkIncluirSismo" Content="Incluir análisis sísmico (Fuerza Sísmica Hidrodinámica F.5 + Fuerza Dinámica de Suelo F.6)" IsChecked="True" ToolTip.Tip="Si está marcada, se calculan la Fuerza Sísmica Hidrodinámica (Housner/ACI 350.3) y la Fuerza Dinámica de Suelo (Mononobe-Okabe), y se incluyen en el diseño sísmico de los muros. Si no, se omiten y los campos de esta sección y de &quot;Dinámico&quot; no se leen."/>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="Aa" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtAa" Text="0.15" ToolTip.Tip="Aa -- coeficiente de aceleración pico efectiva (NSR-10 Título A, mapa de zonificación sísmica del municipio)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="Av" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtAv" Text="0.20" ToolTip.Tip="Av -- coeficiente de velocidad pico efectiva (NSR-10 Título A, mapa de zonificación sísmica del municipio)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="Fa" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtFa" Text="1.30" ToolTip.Tip="Fa -- coeficiente de amplificación del suelo para períodos cortos (NSR-10 Título A, según el perfil de suelo del sitio)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="Fv" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtFv" Text="1.90" ToolTip.Tip="Fv -- coeficiente de amplificación del suelo para períodos largos (NSR-10 Título A, según el perfil de suelo del sitio)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="I -- coeficiente de importancia" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtI" Text="1.25" ToolTip.Tip="I -- coeficiente de importancia de la estructura (NSR-10 Título A, típico 1.0-1.5 según el grupo de uso)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2">
+                  <TextBlock Text="Condición de la base (hi/hc)" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                  <ComboBox Grid.Column="1" Name="CmbCondicionBase" SelectedIndex="0" ToolTip.Tip="Condición de apoyo del muro para el espectro de diseño (relación hi/hc de ACI 350.3): Rígida o Flexible.">
+                    <ComboBoxItem Content="Rígida"/>
+                    <ComboBoxItem Content="Flexible"/>
+                  </ComboBox>
+                </Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2">
+                  <TextBlock Text="Condición de anclaje de la base (Ri/Rc)" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                  <ComboBox Grid.Column="1" Name="CmbCondicionAnclaje" SelectedIndex="1" ToolTip.Tip="Condición de anclaje de la base del muro (relaciones Ri/Rc de ACI 350.3), que fija el factor de reducción de respuesta sísmica.">
+                    <ComboBoxItem Content="Flexible anclada (Ri=3.25, Rc=1.0)"/>
+                    <ComboBoxItem Content="Articulada / empotrada (Ri=3.0, Rc=1.0)"/>
+                    <ComboBoxItem Content="No anclada o sin confinar (Ri=3.0, Rc=2.0)"/>
+                  </ComboBox>
+                </Grid>
+              </StackPanel>
+            </Expander>
+
+            <Expander Header="Dinámico -- fuerza dinámica de suelo (Mononobe-Okabe / Formulario 6)" IsExpanded="True" x:Name="ExpDinamico">
+              <StackPanel Margin="8,8,0,4" Spacing="6">
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="kh -- coeficiente sísmico horizontal" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtKh" Text="0.15" ToolTip.Tip="kh -- coeficiente sísmico horizontal para Mononobe-Okabe (defínalo según el espectro de diseño del proyecto)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="kv -- coeficiente sísmico vertical" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtKv" Text="0.00" ToolTip.Tip="kv -- coeficiente sísmico vertical para Mononobe-Okabe (use 0 si no se considera aceleración vertical)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="δ -- fricción suelo-muro, grados" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtDelta" Text="0" ToolTip.Tip="δ -- ángulo de fricción entre el suelo y el muro, grados (use 0 para una interfaz lisa/conservadora)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="i -- inclinación del relleno, grados" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtIRelleno" Text="0" ToolTip.Tip="i -- inclinación de la superficie del relleno respecto a la horizontal, grados (use 0 para relleno horizontal)."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="β -- inclinación del muro, grados" VerticalAlignment="Center" TextWrapping="Wrap"/><TextBox Grid.Column="1" Name="TxtBeta" Text="90" ToolTip.Tip="β -- inclinación del muro respecto a la horizontal, grados (use 90° para un muro vertical)."/></Grid>
+              </StackPanel>
+            </Expander>
+
+            <Expander Header="Detallado y armaduras" IsExpanded="True" x:Name="ExpDetallado">
+              <StackPanel Margin="8,8,0,4" Spacing="6">
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="Diámetro de barra -- cubierta" VerticalAlignment="Center" TextWrapping="Wrap"/><ComboBox Grid.Column="1" Name="CmbDiametroCubierta" ToolTip.Tip="Diámetro de barra de refuerzo para la PLACA DE CUBIERTA (No.4 a No.10; NSR-10 C.23-C.7.12.2.2 excluye la No.3). Gobierna el recubrimiento efectivo &quot;d&quot; y la separación del detallado."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="Diámetro de barra -- fondo" VerticalAlignment="Center" TextWrapping="Wrap"/><ComboBox Grid.Column="1" Name="CmbDiametroFondo" ToolTip.Tip="Diámetro de barra de refuerzo para la PLACA DE FONDO (No.4 a No.10). Gobierna el recubrimiento efectivo &quot;d&quot; y la separación del detallado."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="Diámetro de barra -- muro longitudinal" VerticalAlignment="Center" TextWrapping="Wrap"/><ComboBox Grid.Column="1" Name="CmbDiametroMuroLong" ToolTip.Tip="Diámetro de barra de refuerzo para el MURO LONGITUDINAL (No.4 a No.10). Gobierna el recubrimiento efectivo &quot;d&quot; y la separación del detallado."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2"><TextBlock Text="Diámetro de barra -- muro transversal" VerticalAlignment="Center" TextWrapping="Wrap"/><ComboBox Grid.Column="1" Name="CmbDiametroMuroTrans" ToolTip.Tip="Diámetro de barra de refuerzo para el MURO TRANSVERSAL (No.4 a No.10). Gobierna el recubrimiento efectivo &quot;d&quot; y la separación del detallado."/></Grid>
+                <Grid ColumnDefinitions="240,*" Margin="0,2">
+                  <TextBlock Text="Método de coeficientes PCA fuera de r tabulado" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                  <ComboBox Grid.Column="1" Name="CmbMetodoInterpolacion" SelectedIndex="0" ToolTip.Tip="Cómo obtener los coeficientes PCA (Caso 3/10) cuando r no cae exactamente en uno de los 10 valores tabulados: interpolación lineal (más preciso) o redondeo conservador al r tabulado inmediatamente superior.">
+                    <ComboBoxItem Content="Interpolar linealmente (recomendado, ya verificado)"/>
+                    <ComboBoxItem Content="Redondear al r tabulado superior (conservador)"/>
+                  </ComboBox>
+                </Grid>
+                <CheckBox Name="ChkIncluirDiagramas" Content="Incluir diagramas de momento por celda (grillas PCA/Marcus completas de placas y muros -- texto extenso)" IsChecked="False" ToolTip.Tip="Agrega al reporte, para cada placa y cada muro, la grilla completa de momentos Mx+/Mx-/My+/My- (cuarto de panel, celda por celda) en vez de solo el valor gobernante. El método PCA/Marcus no tabula un campo distribuido de cortante, así que esta opción no agrega nada a esa parte del reporte."/>
+              </StackPanel>
+            </Expander>
+
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- Backlog v3, Fase B (2026-08-28): la pestaña "Resultados" ya no es un único TextBox; se
+           reconstruye en el code-behind (MostrarResultadosAgrupados) como un Expander por grupo
+           (Datos generales / Hidrostático-Tierras / Sismo / Dinámico / Diseño de losas / Diseño de
+           muros / Envolventes; ver ReporteResultados.GenerarSeccionesAgrupadas), dentro de este
+           contenedor vacío. El reporte de texto plano exportado por "Exportar informe (.txt)" NO
+           cambia; sigue siendo ReporteResultados.GenerarReporte, sin tocar. -->
+      <TabItem Header="Resultados">
+        <ScrollViewer>
+          <StackPanel Name="PanelResultados" Margin="12" Spacing="8">
+            <TextBlock Name="TxtResultadosVacio"
+                       Text="Complete los datos de entrada y presione &quot;Calcular&quot;."
+                       Foreground="#6B7280" FontStyle="Italic"/>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- Fase 2 del frente de interfaz (2026-08-30): pestaña dedicada de diagramas. Se rellena en
+           el code-behind (MostrarDiagramas) con el cortante gobernante puntual y, por cada curva, un
+           DiagramaMomentoControl con la faja gobernante de momento. -->
+      <TabItem Header="Diagramas">
+        <ScrollViewer>
+          <StackPanel Name="PanelDiagramas" Margin="12" Spacing="0">
+            <TextBlock Text="Complete los datos de entrada y presione &quot;Calcular&quot;."
+                       Foreground="#6B7280" FontStyle="Italic"/>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+    </TabControl>
+
+    <!-- Pie: acción y estado. Grid (no StackPanel horizontal) para que TxtEstado tenga un ancho
+         acotado; un StackPanel horizontal da ancho infinito a sus hijos, así que TextWrapping
+         nunca se activaba y los mensajes largos (p.ej. la sugerencia de ajuste geométrico) se
+         cortaban contra el borde de la ventana en vez de ajustarse en varias líneas (encontrado
+         por el usuario probando la aplicación real, 2026-08-27). -->
+    <Border Grid.Row="2" Padding="12" BorderThickness="0,1,0,0" BorderBrush="#D1D5DB">
+      <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*">
+        <Button Grid.Column="0" Name="BtnCalcular" Content="Calcular" Padding="16,6" Click="BtnCalcular_Click" VerticalAlignment="Top"/>
+        <Button Grid.Column="1" Name="BtnExportar" Content="Exportar informe (.txt)" Padding="16,6" Margin="8,0,0,0" Click="BtnExportar_Click" VerticalAlignment="Top"/>
+        <Button Grid.Column="2" Name="BtnExportarHtml" Content="Exportar HTML" Padding="16,6" Margin="8,0,0,0" Click="BtnExportarHtml_Click" VerticalAlignment="Top"/>
+        <Button Grid.Column="3" Name="BtnExportarCsv" Content="Exportar CSV" Padding="16,6" Margin="8,0,0,0" Click="BtnExportarCsv_Click" VerticalAlignment="Top"/>
+        <Button Grid.Column="4" Name="BtnGuardarProyecto" Content="Guardar proyecto" Padding="16,6" Margin="8,0,0,0" Click="BtnGuardarProyecto_Click" VerticalAlignment="Top"/>
+        <Button Grid.Column="5" Name="BtnAbrirProyecto" Content="Abrir proyecto" Padding="16,6" Margin="8,0,0,0" Click="BtnAbrirProyecto_Click" VerticalAlignment="Top"/>
+        <TextBlock Grid.Column="6" Name="TxtEstado" Margin="12,0,0,0" VerticalAlignment="Center" TextWrapping="Wrap"/>
+      </Grid>
+    </Border>
+
+  </Grid>
+</Window>

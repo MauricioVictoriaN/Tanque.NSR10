@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <!--
+    NOTA: este proyecto requiere acceso a nuget.org para restaurar (xunit, Microsoft.NET.Test.Sdk).
+    El sandbox de la sesión en la nube que generó este scaffold tiene nuget.org bloqueado por su
+    lista blanca de red, así que estas pruebas NO se compilaron ni corrieron en esa sesión: se
+    verificaron en su lugar con el proyecto sin dependencias tools/Tanque.Core.Verificacion (ver
+    README.md en la raíz del repositorio). Restaurar y correr normalmente en un equipo con acceso
+    a NuGet: dotnet test
+  -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="coverlet.collector" Version="6.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Tanque.Core"><HintPath>..\..\libs\Tanque.Core.dll</HintPath></Reference>
+    <ProjectReference Include="..\..\src\Tanque.Reportes\Tanque.Reportes.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\casos_prueba\*.json" CopyToOutputDirectory="PreserveNewest" LinkBase="casos_prueba" />
+  </ItemGroup>
+
+</Project>

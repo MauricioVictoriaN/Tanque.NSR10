@@ -1,0 +1,1497 @@
+{
+  "id": "ejercicio_1_tanque_lados_iguales",
+  "fuente": {
+    "documento": "Villamarín Barón, Andrés Enrique (2018). Tesis de grado — programa de análisis y diseño estructural de tanques.",
+    "seccion": "8.1 Ejercicio 1: Tanque descubierto de lados iguales",
+    "paginas": "86-104",
+    "tablas_origen": [
+      "Tabla 14",
+      "Tabla 15",
+      "Tabla 16",
+      "Tabla 17",
+      "Tabla 18",
+      "Tabla 19",
+      "Tabla 20",
+      "Tabla 21",
+      "Tabla 22",
+      "Tabla 23",
+      "Tabla 24",
+      "Tabla 25",
+      "Tabla 26",
+      "Tabla 27",
+      "Tabla 28",
+      "Tabla 29",
+      "Tabla 30",
+      "Tabla 31",
+      "Tabla 32",
+      "Tabla 33",
+      "Tabla 34",
+      "Tabla 35"
+    ]
+  },
+  "descripcion": "Tanque enterrado, sin tapa (cubierta), sin fuerza sísmica. Caso base para validar geometría, cargas gravitacionales, presiones laterales (hidrostática + suelo), motor de combinaciones de carga sin sismo, análisis PCA de muros y placa de fondo, y diseño a flexión/cortante/control de fisuración con corrección Sd.",
+  "verificacion_automatica": "Todos los valores escalares (Ka, Ph, Ps2, combinaciones de carga, subpresión, Ec, factor de rigidez DD) fueron recalculados de forma independiente con un script Python a partir de las fórmulas documentadas en Fase0_Especificacion_Normativa.docx y coinciden exactamente con los valores publicados en la tesis, confirmando la consistencia entre la especificación (secciones 2, 3, 6, 7, 8) y este caso de prueba.",
+  "entradas": {
+    "geometria": {
+      "B_ancho_m": 4.5,
+      "L_largo_m": 4.5,
+      "Ht_altura_m": 3.0,
+      "con_tapa": false,
+      "em_espesor_muro_m": 0.15,
+      "ef_espesor_fondo_m": 0.1,
+      "HL_altura_liquido_m": 3.0,
+      "Hm_altura_suelo_sobre_muro_m": 3.0,
+      "Wext_sobrecarga_kNm2": 0.0
+    },
+    "materiales": {
+      "fc_MPa": 28,
+      "fy_MPa": 420,
+      "gamma_suelo_kNm3": 16,
+      "gamma_concreto_kNm3": 24,
+      "gamma_liquido_kNm3": 9.81
+    },
+    "suelo": {
+      "phi_grados": 32,
+      "resistencia_admisible_suelo_fundacion_kNm2": 120,
+      "nivel_freatico_desde_superficie_m": -2.5
+    },
+    "notas_espesores_minimos": {
+      "muro": "min(150mm, L/30=150mm) -> 150mm (C.23-C.14.6.1)",
+      "fondo": "100mm con línea única de refuerzo (C.23-C.15.14.3.1)"
+    }
+  },
+  "resultados_esperados": {
+    "peso_tanque_kN": {
+      "muros_x4": 181.656,
+      "placa_cimentacion": 48.6,
+      "total": 230.256,
+      "vol_muros_m3": 7.569,
+      "vol_placa_m3": 2.025,
+      "Pm1_par_muros_tipo_B_kN": 43.848,
+      "Pm2_par_muros_tipo_L_kN": 46.98,
+      "_correccion_esta_sesion": "El valor original de esta sección (muros_x4=93.96, total=142.56) fue transcrito directamente de la Tabla 14 de la tesis (p.87) SIN verificación independiente -- la nota 'verificacion_automatica' de este archivo lista explícitamente qué escalares fueron recalculados (Ka, Ph, Ps2, combinaciones de carga, subpresión, Ec, DD) y el peso del tanque NO estaba en esa lista. Verificación esta sesión: aplicando la fórmula confirmada por IL y por el .vb del Anexo 4 de la tesis (Pm1=(Ht-ef-et)*(B-2*em)*em*Dc; Pm2=(Ht-ef-et)*L*em*Dc; Ptt=2*Pm1+2*Pm2+Pt+Pf) con los insumos de este mismo ejercicio (Ht=3.0, ef=0.1, et=0, em=0.15, B=L=4.5, Dc=24) da muros_x4=181.656 kN, no 93.96 kN. La fórmula se confirmó independientemente correcta al aplicarla a la Tabla 36 del ejercicio 2 (p.106), donde SÍ reproduce exactamente los valores publicados (Pm1=51.168, Pm2=74.88 -- el mismo caso de prueba ejercicio_2_tanque_lados_dispares_sismo.json). Conclusión: la Tabla 14 del ejercicio 1 en la tesis tiene un error aritmético propio (no es un bug del programa ni de Tanque.Core) -- placa_cimentacion (48.6) sí coincide exactamente con la fórmula y se mantiene sin cambios. Los valores de este bloque fueron corregidos para reflejar la fórmula confirmada, no la tabla publicada; ver claude/ruta-trabajo-proximas-sesiones.md."
+    },
+    "presiones_diseno": {
+      "Ph_hidrostatica_kNm2": 29.43,
+      "Ka": 0.2544,
+      "Ps2_suelo_kNm2": 12.21
+    },
+    "combinaciones_carga": {
+      "condicion_1_presion_interna": {
+        "combinacion": "B.2.4-1 (1.4F)",
+        "valor_kNm2": 41.202
+      },
+      "condicion_2_presion_externa": {
+        "combinacion": "B.2.4-6 (1.6H)",
+        "valor_kNm2": 19.536
+      },
+      "condicion_3_flotacion": {
+        "subpresion_kNm2": 5.886,
+        "subpresion_total_kN": 119.19,
+        "peso_tanque_factorado_0_9D_kN": 128.304,
+        "resultado": "128.304 > 119.19 -> no requiere redimensionamiento"
+      }
+    },
+    "analisis_muros": {
+      "relacion_L_H": 1.5,
+      "caso_PCA": "Caso 3, capítulo 2 del manual PCA (Rectangular Concrete Tanks, 5a ed.)",
+      "Ec_MPa": 24870.06,
+      "DD_rigidez_Nmm": 7286150.2,
+      "DD_nota_unidades": "DD = Ec[MPa] x tw[mm]^3 / (12x(1-0.2^2)) -- el espesor del muro debe sustituirse en MILIMETROS (150mm), no en metros, para reproducir el valor publicado. Confirmado por verificación numérica independiente (7286150 vs 150mm^3 -> match; con tw en metros el resultado difiere en un factor de 10^6).",
+      "cortantes_tabla17": {
+        "unidades": "Cs adimensional (coeficiente PCA); cortante en kN",
+        "fondo_punto_central": {
+          "Cs": 0.4,
+          "V_condicion1_kN": 49.44,
+          "V_condicion2_kN": 23.44
+        },
+        "borde_lateral_valor_maximo": {
+          "Cs": 0.26,
+          "V_condicion1_kN": 32.13,
+          "V_condicion2_kN": 15.238
+        },
+        "borde_lateral_punto_central": {
+          "Cs": 0.26,
+          "V_condicion1_kN": 32.13,
+          "V_condicion2_kN": 15.238
+        }
+      },
+      "deflexiones_horizontales_mm_tabla18": {
+        "columnas_fraccion_b": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5
+        ],
+        "coeficiente": [
+          0.0,
+          0.4,
+          1.0,
+          1.7,
+          2.1,
+          2.3
+        ],
+        "condicion_1": [
+          0.0,
+          0.183,
+          0.458,
+          0.779,
+          0.962,
+          1.053
+        ],
+        "condicion_2": [
+          0.0,
+          0.084,
+          0.21,
+          0.357,
+          0.441,
+          0.483
+        ]
+      },
+      "deflexiones_verticales_mm_tabla19": {
+        "columnas_fraccion_a": [
+          "Fondo",
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6,
+          0.7,
+          0.8,
+          0.9,
+          "Tope"
+        ],
+        "coeficiente": [
+          0.0,
+          0.2,
+          0.8,
+          1.3,
+          1.9,
+          2.3,
+          2.6,
+          2.8,
+          2.9,
+          3.0,
+          3.1
+        ],
+        "condicion_1": [
+          0.0,
+          0.09,
+          0.37,
+          0.6,
+          0.87,
+          1.05,
+          1.19,
+          1.28,
+          1.33,
+          1.37,
+          1.42
+        ],
+        "condicion_2": [
+          0.0,
+          0.02,
+          0.08,
+          0.13,
+          0.19,
+          0.23,
+          0.26,
+          0.28,
+          0.29,
+          0.3,
+          0.31
+        ]
+      },
+      "momentos_kNm": {
+        "nota": "Filas = posición vertical (Tope a Fondo, fracción de a=altura); columnas = posición horizontal (Inicio/0 a 0.5b=centro; por simetría 0.1b=0.9b, 0.2b=0.8b, etc.)",
+        "filas_fraccion_a": [
+          "Tope",
+          0.9,
+          0.8,
+          0.7,
+          0.6,
+          0.5,
+          0.4,
+          0.3,
+          0.2,
+          0.1,
+          "Fondo"
+        ],
+        "columnas_fraccion_b": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5
+        ],
+        "condicion_1_Mx_tabla20": [
+          [
+            -2.6,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            -3.34,
+            -1.11,
+            0.0,
+            0.74,
+            1.11,
+            1.11
+          ],
+          [
+            -3.34,
+            -1.11,
+            0.37,
+            1.48,
+            2.22,
+            2.6
+          ],
+          [
+            -3.34,
+            -1.11,
+            1.11,
+            2.6,
+            3.71,
+            4.08
+          ],
+          [
+            -3.34,
+            -0.74,
+            1.85,
+            3.71,
+            4.82,
+            5.19
+          ],
+          [
+            -3.34,
+            0.0,
+            2.6,
+            4.45,
+            5.19,
+            5.56
+          ],
+          [
+            -2.97,
+            0.0,
+            2.6,
+            4.08,
+            4.82,
+            5.19
+          ],
+          [
+            -2.22,
+            0.37,
+            1.85,
+            2.6,
+            2.97,
+            2.97
+          ],
+          [
+            -1.48,
+            -0.37,
+            -0.37,
+            -0.74,
+            -1.48,
+            -1.85
+          ],
+          [
+            -0.37,
+            -1.48,
+            -4.45,
+            -7.42,
+            -9.27,
+            -10.01
+          ],
+          [
+            0.0,
+            -4.82,
+            -11.87,
+            -17.8,
+            -21.14,
+            -22.62
+          ]
+        ],
+        "condicion_1_My_tabla21": [
+          [
+            -12.61,
+            -7.79,
+            -0.74,
+            4.08,
+            7.05,
+            7.79
+          ],
+          [
+            -15.95,
+            -7.05,
+            -0.37,
+            4.08,
+            6.67,
+            7.79
+          ],
+          [
+            -16.32,
+            -6.67,
+            0.0,
+            4.08,
+            6.67,
+            7.42
+          ],
+          [
+            -16.32,
+            -6.3,
+            0.37,
+            4.45,
+            6.67,
+            7.42
+          ],
+          [
+            -16.32,
+            -5.56,
+            0.74,
+            4.45,
+            6.3,
+            7.05
+          ],
+          [
+            -15.95,
+            -4.82,
+            1.11,
+            4.08,
+            5.56,
+            6.3
+          ],
+          [
+            -14.09,
+            -3.71,
+            1.48,
+            3.71,
+            4.82,
+            4.82
+          ],
+          [
+            -11.12,
+            -2.6,
+            1.11,
+            2.6,
+            2.97,
+            3.34
+          ],
+          [
+            -7.05,
+            -1.48,
+            0.37,
+            1.11,
+            1.11,
+            1.11
+          ],
+          [
+            -2.22,
+            -0.74,
+            -0.74,
+            -1.11,
+            -1.48,
+            -1.48
+          ],
+          [
+            0.0,
+            -1.11,
+            -2.22,
+            -3.71,
+            -4.08,
+            -4.45
+          ]
+        ],
+        "condicion_2_Mx_tabla22": [
+          [
+            -1.23,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            -1.58,
+            -0.53,
+            0.0,
+            0.35,
+            0.53,
+            0.53
+          ],
+          [
+            -1.58,
+            -0.53,
+            0.18,
+            0.7,
+            1.05,
+            1.23
+          ],
+          [
+            -1.58,
+            -0.53,
+            0.53,
+            1.23,
+            1.76,
+            1.93
+          ],
+          [
+            -1.58,
+            -0.35,
+            0.88,
+            1.76,
+            2.29,
+            2.46
+          ],
+          [
+            -1.58,
+            0.0,
+            1.23,
+            2.11,
+            2.46,
+            2.64
+          ],
+          [
+            -1.41,
+            0.0,
+            1.23,
+            1.93,
+            2.29,
+            2.46
+          ],
+          [
+            -1.05,
+            0.18,
+            0.88,
+            1.23,
+            1.41,
+            1.41
+          ],
+          [
+            -0.7,
+            -0.18,
+            -0.18,
+            -0.35,
+            -0.7,
+            -0.88
+          ],
+          [
+            -0.18,
+            -0.7,
+            -2.11,
+            -3.52,
+            -4.4,
+            -4.75
+          ],
+          [
+            0.0,
+            -2.29,
+            -5.63,
+            -8.44,
+            -10.02,
+            -10.73
+          ]
+        ],
+        "condicion_2_My_tabla23": [
+          [
+            -5.98,
+            -3.69,
+            -0.35,
+            1.93,
+            3.34,
+            3.69
+          ],
+          [
+            -7.56,
+            -3.34,
+            -0.18,
+            1.93,
+            3.16,
+            3.69
+          ],
+          [
+            -7.74,
+            -3.16,
+            0.0,
+            1.93,
+            3.16,
+            3.52
+          ],
+          [
+            -7.74,
+            -2.99,
+            0.18,
+            2.11,
+            3.16,
+            3.52
+          ],
+          [
+            -7.74,
+            -2.64,
+            0.35,
+            2.11,
+            2.99,
+            3.34
+          ],
+          [
+            -7.56,
+            -2.29,
+            0.53,
+            1.93,
+            2.64,
+            2.99
+          ],
+          [
+            -6.68,
+            -1.76,
+            0.7,
+            1.76,
+            2.29,
+            2.29
+          ],
+          [
+            -5.27,
+            -1.23,
+            0.53,
+            1.23,
+            1.41,
+            1.58
+          ],
+          [
+            -3.34,
+            -0.7,
+            0.18,
+            0.53,
+            0.53,
+            0.53
+          ],
+          [
+            -1.05,
+            -0.35,
+            -0.35,
+            -0.53,
+            -0.7,
+            -0.7
+          ],
+          [
+            0.0,
+            -0.53,
+            -1.05,
+            -1.76,
+            -1.93,
+            -2.11
+          ]
+        ]
+      }
+    },
+    "analisis_placa_fondo": {
+      "relacion_b_a": 1.0,
+      "caso_PCA": "Caso 10, capítulo 2 del manual PCA",
+      "revision_flotacion": {
+        "subpresion_kNm2": 5.886,
+        "fuerza_subpresion_kN": 119.19,
+        "peso_factorado_kN": 128.304,
+        "cumple": true
+      },
+      "cortantes_tabla24_kN": {
+        "fondo_punto_central": {
+          "Cs": 0.34,
+          "V_kN": 8.97
+        },
+        "borde_lateral_valor_maximo": {
+          "Cs": 0.34,
+          "V_kN": 8.97
+        },
+        "borde_lateral_punto_central": {
+          "Cs": 0.34,
+          "V_kN": 8.97
+        },
+        "tope_placa_punto_central": {
+          "Cs": 0.34,
+          "V_kN": 8.97
+        }
+      },
+      "deflexiones_mm_tabla25": {
+        "columnas_fraccion_b": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5
+        ],
+        "coeficiente": [
+          0.0,
+          1.3,
+          2.5,
+          3.3,
+          3.9,
+          4.1
+        ],
+        "condicion_3": [
+          0.0,
+          1.453,
+          2.795,
+          3.689,
+          4.36,
+          4.584
+        ],
+        "nota": "Simétrico en ambas direcciones por b/a=1; deformación convexa (hacia arriba) por ser condición de flotación/subpresión"
+      },
+      "momentos_kNm": {
+        "nota": "Valores redondeados a enteros en la fuente (magnitudes pequeñas). Filas = posición a lo largo de un eje (Tope/Inicio-muro a Fondo/final-muro), columnas = fracción del otro eje.",
+        "filas_fraccion": [
+          "Tope",
+          0.9,
+          0.8,
+          0.7,
+          0.6,
+          0.5,
+          0.4,
+          0.3,
+          0.2,
+          0.1,
+          "Fondo"
+        ],
+        "columnas_fraccion_b": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5
+        ],
+        "positivo_X_tabla26": [
+          [
+            4,
+            4,
+            3,
+            2,
+            1,
+            0
+          ],
+          [
+            4,
+            5,
+            5,
+            4,
+            3,
+            2
+          ],
+          [
+            3,
+            4,
+            5,
+            5,
+            5,
+            4
+          ],
+          [
+            2,
+            4,
+            5,
+            5,
+            5,
+            5
+          ],
+          [
+            1,
+            3,
+            4,
+            5,
+            5,
+            5
+          ],
+          [
+            0,
+            2,
+            3,
+            4,
+            5,
+            5
+          ],
+          [
+            1,
+            3,
+            4,
+            5,
+            5,
+            5
+          ],
+          [
+            2,
+            4,
+            5,
+            5,
+            5,
+            5
+          ],
+          [
+            3,
+            4,
+            5,
+            5,
+            5,
+            4
+          ],
+          [
+            4,
+            5,
+            5,
+            4,
+            3,
+            2
+          ],
+          [
+            4,
+            4,
+            3,
+            2,
+            1,
+            0
+          ]
+        ],
+        "positivo_Y_tabla27": [
+          [
+            4,
+            4,
+            3,
+            2,
+            1,
+            0
+          ],
+          [
+            4,
+            5,
+            4,
+            4,
+            3,
+            2
+          ],
+          [
+            3,
+            5,
+            5,
+            5,
+            4,
+            3
+          ],
+          [
+            2,
+            4,
+            5,
+            5,
+            5,
+            4
+          ],
+          [
+            1,
+            3,
+            5,
+            5,
+            5,
+            5
+          ],
+          [
+            0,
+            2,
+            4,
+            5,
+            5,
+            5
+          ],
+          [
+            1,
+            3,
+            5,
+            5,
+            5,
+            5
+          ],
+          [
+            2,
+            4,
+            5,
+            5,
+            5,
+            4
+          ],
+          [
+            3,
+            5,
+            5,
+            5,
+            4,
+            3
+          ],
+          [
+            4,
+            5,
+            4,
+            4,
+            3,
+            2
+          ],
+          [
+            4,
+            4,
+            3,
+            2,
+            1,
+            0
+          ]
+        ],
+        "negativo_X_tabla28": [
+          [
+            -4,
+            -4,
+            -3,
+            -2,
+            -1,
+            0
+          ],
+          [
+            -4,
+            -3,
+            -1,
+            0,
+            0,
+            0
+          ],
+          [
+            -3,
+            -2,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            -2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            -1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            -1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            -2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            -3,
+            -2,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            -4,
+            -3,
+            -1,
+            0,
+            0,
+            0
+          ],
+          [
+            -4,
+            -4,
+            -3,
+            -2,
+            -1,
+            0
+          ]
+        ],
+        "negativo_Y_tabla29": [
+          [
+            -4,
+            -4,
+            -3,
+            -2,
+            -1,
+            0
+          ],
+          [
+            -4,
+            -3,
+            -2,
+            0,
+            0,
+            0
+          ],
+          [
+            -3,
+            -1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            -2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            -1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            -1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            -2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            -3,
+            -1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            -4,
+            -3,
+            -2,
+            0,
+            0,
+            0
+          ],
+          [
+            -4,
+            -4,
+            -3,
+            -2,
+            -1,
+            0
+          ]
+        ]
+      }
+    },
+    "diseno": {
+      "cortante_tabla30": {
+        "muros_condicion1": {
+          "Vu_kN": 46.71,
+          "Vc_kN": 81.2,
+          "cumple": true
+        },
+        "muros_condicion2": {
+          "Vu_kN": 22.1,
+          "Vc_kN": 81.2,
+          "cumple": true
+        },
+        "placa_fondo_condicion3": {
+          "Vu_kN": 8.94,
+          "Vc_kN": 49.96,
+          "cumple": true
+        }
+      },
+      "flexion_inicial_muros_tabla31": {
+        "externa_condicion1_horizontal": {
+          "rho": 0.0033,
+          "As_mm2": 433.33,
+          "varilla": "#4 (129mm2)",
+          "espaciamiento_m": 0.2
+        },
+        "externa_condicion1_vertical": {
+          "rho": 0.0033,
+          "As_mm2": 433.33,
+          "varilla": "#4 (129mm2)",
+          "espaciamiento_m": 0.2
+        },
+        "interna_condicion2_horizontal": {
+          "rho": 0.0033,
+          "As_mm2": 433.33,
+          "varilla": "#4 (129mm2)",
+          "espaciamiento_m": 0.2
+        },
+        "interna_condicion2_vertical": {
+          "rho": 0.0037,
+          "As_mm2": 476.71,
+          "varilla": "#4 (129mm2)",
+          "espaciamiento_m": 0.2
+        }
+      },
+      "flexion_inicial_placa_tabla32": {
+        "X": {
+          "rho": 0.0033,
+          "As_mm2": 266.67,
+          "varilla": "#4 (129mm2)",
+          "espaciamiento_m": 0.25
+        },
+        "Y": {
+          "rho": 0.0033,
+          "As_mm2": 266.67,
+          "varilla": "#4 (129mm2)",
+          "espaciamiento_m": 0.25
+        }
+      },
+      "revision_Sd_muros_tabla33": {
+        "columnas": [
+          "C1_Mpos_Vert",
+          "C1_Mpos_Horiz",
+          "C1_Mneg_Vert",
+          "C1_Mneg_Horiz",
+          "C2_Mpos_Vert",
+          "C2_Mpos_Horiz",
+          "C2_Mneg_Vert",
+          "C2_Mneg_Horiz"
+        ],
+        "Es_MPa": [
+          200000,
+          200000,
+          200000,
+          200000,
+          200000,
+          200000,
+          200000,
+          200000
+        ],
+        "Ec_MPa": [
+          24870,
+          24870,
+          24870,
+          24870,
+          24870,
+          24870,
+          24870,
+          24870
+        ],
+        "n": [
+          8.04,
+          8.04,
+          8.04,
+          8.04,
+          8.04,
+          8.04,
+          8.04,
+          8.04
+        ],
+        "rho": [
+          0.0033,
+          0.0033,
+          0.0033,
+          0.0033,
+          0.0033,
+          0.0033,
+          0.0033,
+          0.0033
+        ],
+        "k": [
+          0.2054,
+          0.2054,
+          0.2054,
+          0.2054,
+          0.2054,
+          0.2054,
+          0.2054,
+          0.2054
+        ],
+        "j": [
+          0.9315,
+          0.9315,
+          0.9315,
+          0.9315,
+          0.9315,
+          0.9315,
+          0.9315,
+          0.9315
+        ],
+        "d_mm": [
+          130,
+          130,
+          130,
+          130,
+          130,
+          130,
+          130,
+          130
+        ],
+        "As_mm2": [
+          516,
+          516,
+          516,
+          516,
+          516,
+          516,
+          516,
+          516
+        ],
+        "S_mm": [
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200
+        ],
+        "Mu_kNm": [
+          5.56,
+          7.42,
+          22.62,
+          16.32,
+          2.64,
+          3.69,
+          10.73,
+          7.74
+        ],
+        "Ms_kNm": [
+          3.97,
+          5.3,
+          16.16,
+          11.66,
+          1.89,
+          2.64,
+          7.66,
+          5.53
+        ],
+        "fs_MPa": [
+          63.56,
+          84.82,
+          258.56,
+          186.55,
+          30.18,
+          42.18,
+          122.65,
+          88.47
+        ],
+        "fsadm_MPa": [
+          179.02,
+          179.02,
+          179.02,
+          179.02,
+          179.02,
+          179.02,
+          179.02,
+          179.02
+        ],
+        "requiere_rediseno": [
+          false,
+          false,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false
+        ],
+        "AsR_mm2": [
+          516,
+          516,
+          745,
+          538,
+          516,
+          516,
+          516,
+          516
+        ],
+        "rho_nuevo": [
+          0.0033,
+          0.0033,
+          0.00573,
+          0.0041,
+          0.0033,
+          0.0033,
+          0.0033,
+          0.0033
+        ],
+        "k_nuevo": [
+          0.2054,
+          0.2054,
+          0.261,
+          0.2268,
+          0.2054,
+          0.2054,
+          0.2054,
+          0.2054
+        ],
+        "j_nuevo": [
+          0.9315,
+          0.9315,
+          0.913,
+          0.9244,
+          0.9315,
+          0.9315,
+          0.9315,
+          0.9315
+        ],
+        "S_nueva_mm": [
+          200,
+          200,
+          148,
+          193,
+          200,
+          200,
+          200,
+          200
+        ],
+        "fs_nuevo_MPa": [
+          63.56,
+          84.82,
+          182.66,
+          180.41,
+          30.18,
+          42.18,
+          122.65,
+          88.47
+        ],
+        "fsadm_recalculado_MPa": [
+          179.02,
+          179.02,
+          218.34,
+          183.29,
+          179.02,
+          179.02,
+          179.02,
+          179.02
+        ],
+        "gamma": [
+          1.4,
+          1.4,
+          1.4,
+          1.4,
+          1.4,
+          1.4,
+          1.4,
+          1.4
+        ],
+        "Sd": [
+          4.25,
+          3.18,
+          1.48,
+          1.5,
+          8.95,
+          6.4,
+          2.2,
+          3.05
+        ]
+      },
+      "revision_Sd_placa_tabla34": {
+        "columnas": [
+          "Vertical",
+          "Horizontal"
+        ],
+        "Es_MPa": [
+          200000,
+          200000
+        ],
+        "Ec_MPa": [
+          24870,
+          24870
+        ],
+        "n": [
+          8.04,
+          8.04
+        ],
+        "rho": [
+          0.0033,
+          0.0033
+        ],
+        "k": [
+          0.2054,
+          0.2054
+        ],
+        "j": [
+          0.9315,
+          0.9315
+        ],
+        "d_mm": [
+          130,
+          130
+        ],
+        "As_mm2": [
+          516,
+          516
+        ],
+        "S_mm": [
+          250,
+          250
+        ],
+        "Mu_kNm": [
+          5,
+          4
+        ],
+        "Ms_kNm": [
+          3.57,
+          2.86
+        ],
+        "fs_MPa": [
+          57.15,
+          45.72
+        ],
+        "fsadm_MPa": [
+          179.02,
+          179.02
+        ],
+        "requiere_rediseno": [
+          false,
+          false
+        ],
+        "AsR_mm2": [
+          516,
+          516
+        ],
+        "rho_nuevo": [
+          0.0033,
+          0.0033
+        ],
+        "k_nuevo": [
+          0.2053675,
+          0.2053675
+        ],
+        "j_nuevo": [
+          0.9315,
+          0.9315
+        ],
+        "S_nueva_mm": [
+          250,
+          250
+        ],
+        "fs_nuevo_MPa": [
+          57.15,
+          45.72
+        ],
+        "fsadm_recalculado_MPa": [
+          179.02186,
+          179.02186
+        ],
+        "gamma": [
+          1.4,
+          1.4
+        ],
+        "Sd": [
+          4.72,
+          5.91
+        ]
+      },
+      "resumen_final_tabla35": [
+        {
+          "elemento": "Muros-Cara Externa",
+          "sector": "Zona central",
+          "sentido": "Vertical",
+          "refuerzo": "#4 c/0.2m"
+        },
+        {
+          "elemento": "Muros-Cara Externa",
+          "sector": "Zona central",
+          "sentido": "Horizontal",
+          "refuerzo": "#4 c/0.2m"
+        },
+        {
+          "elemento": "Muros-Cara Externa",
+          "sector": "Borde Lateral",
+          "sentido": "Horizontal",
+          "refuerzo": "#4 c/0.2m"
+        },
+        {
+          "elemento": "Muros-Cara Externa",
+          "sector": "Borde Inferior",
+          "sentido": "Vertical",
+          "refuerzo": "#4 c/0.2m"
+        },
+        {
+          "elemento": "Muros-Cara Interna",
+          "sector": "Zona central",
+          "sentido": "Vertical",
+          "refuerzo": "#4 c/0.2m"
+        },
+        {
+          "elemento": "Muros-Cara Interna",
+          "sector": "Zona central",
+          "sentido": "Horizontal",
+          "refuerzo": "#4 c/0.2m"
+        },
+        {
+          "elemento": "Muros-Cara Interna",
+          "sector": "Borde Lateral",
+          "sentido": "Horizontal",
+          "refuerzo": "#4 c/0.19m"
+        },
+        {
+          "elemento": "Muros-Cara Interna",
+          "sector": "Borde Inferior",
+          "sentido": "Vertical",
+          "refuerzo": "#4 c/0.15m"
+        },
+        {
+          "elemento": "Placa de fondo",
+          "sector": "Toda la placa",
+          "sentido": "X",
+          "refuerzo": "#4 c/0.2m"
+        },
+        {
+          "elemento": "Placa de fondo",
+          "sector": "Toda la placa",
+          "sentido": "Y",
+          "refuerzo": "#4 c/0.2m"
+        }
+      ]
+    }
+  },
+  "notas_verificacion": [
+    "footnote de la tesis en Tabla 30 atribuye el cortante de muros a 'tabla 21' (que en realidad es la tabla de momentos My), aparente inconsistencia de referencia cruzada de la propia fuente -- el valor 46.71kN coincide en orden de magnitud con la fila 'Fondo-Punto central' de la Tabla 17 (cortante) modificada por el factor phi de la ecuación 7-9, no con la tabla 21 citada; se transcribe el valor numérico tal cual (correcto) pero se marca la referencia de tabla como posible errata de la fuente.",
+    "Tabla 19 (deflexiones verticales) aparece rotulada en la fuente como 'Ejercicio 2' pese a estar dentro de la sección 8.1 (Ejercicio 1); es evidentemente una errata de numeración de la tesis, no un dato de otro ejercicio -- se transcribe en el lugar correcto (Ejercicio 1) según su ubicación secuencial y su consistencia con los demás datos de este ejercicio."
+  ]
+}

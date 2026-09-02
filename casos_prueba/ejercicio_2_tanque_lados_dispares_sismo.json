@@ -1,0 +1,658 @@
+{
+  "id": "ejercicio_2_tanque_lados_dispares_sismo",
+  "fuente": {
+    "documento": "Villamarín Barón, Andrés Enrique (2018). Tesis de grado — programa de análisis y diseño estructural de tanques.",
+    "seccion": "8.2 Ejercicio 2: Diseño de tanque lados dispares e incluyendo fuerza sísmica",
+    "paginas": "104-139",
+    "tablas_origen": [
+      "Tabla 36",
+      "Tabla 37",
+      "Tabla 38",
+      "Tabla 39",
+      "Tabla 40",
+      "Tabla 71",
+      "Tabla 72",
+      "Tabla 73",
+      "Tabla 74",
+      "Tabla 75",
+      "Tabla 76"
+    ]
+  },
+  "descripcion": "Tanque con tapa, lados desiguales (4.50m x 6.00m), incluye fuerza sísmica hidrodinámica (Housner, muro longitudinal y transversal) y fuerza dinámica de suelo (Mononobe-Okabe). Caso de prueba de mayor valor para los módulos 4 y 5 de la especificación, actualmente los menos verificados contra el IL.",
+  "verificacion_automatica": "Los escalares de mayor riesgo de transcripción (Ka, theta, psi, Kae, Keq, Qae) fueron recalculados de forma independiente con un script Python a partir de las fórmulas de los módulos 3 y 5 de Fase0_Especificacion_Normativa.docx y coinciden con los valores publicados en la tesis (Ka=0.2818, theta=11.31°, psi=2.28, Kae=0.4193, Keq=0.1376, Qae=7.43kN/m²), confirmando de forma independiente la corrección de esas fórmulas para un segundo juego de datos de entrada distinto al usado en la verificación IL de la sección 0.2 del documento de especificación.",
+  "entradas": {
+    "geometria": {
+      "B_ancho_m": 4.5,
+      "L_largo_m": 6.0,
+      "Ht_altura_m": 3.0,
+      "con_tapa": true,
+      "em_espesor_muro_m": 0.2,
+      "ef_espesor_fondo_m": 0.15,
+      "et_espesor_tapa_m": 0.25,
+      "HL_altura_liquido_m": 3.0,
+      "Hm_altura_suelo_sobre_muro_m": 3.0,
+      "Wext_sobrecarga_kNm2": 0.0
+    },
+    "materiales": {
+      "fc_MPa": 28,
+      "fy_MPa": 420,
+      "gamma_suelo_kNm3": 18,
+      "gamma_concreto_kNm3": 24,
+      "gamma_liquido_kNm3": 9.81
+    },
+    "suelo": {
+      "phi_grados": 28,
+      "resistencia_admisible_suelo_fundacion_kNm2": 20,
+      "nivel_freatico": "no presenta"
+    },
+    "sismo": {
+      "ubicacion": "Tunja",
+      "perfil_suelo": "Tipo D",
+      "uso": "Garajes (categoría de uso II)",
+      "Aa": 0.2,
+      "Av": 0.2,
+      "Fa": 1.3,
+      "Fv": 2.0,
+      "kh_coef_sismico_horizontal": 0.2,
+      "kv_coef_sismico_vertical": 0.0
+    },
+    "notas_espesores_minimos": {
+      "muro": "max(L/30=200mm [muro largo], L/30=150mm [muro corto]) -> se toma 200mm",
+      "fondo": "150mm, elegido mayor al mínimo para permitir doble línea de refuerzo",
+      "tapa": "L/20=225mm -> redondeado a 250mm (NSR-10 tabla C.9.5(a), losa maciza simplemente apoyada en una dirección)"
+    }
+  },
+  "resultados_esperados": {
+    "peso_tanque_kN_tabla36": {
+      "muro_direccion_larga": {
+        "vol_m3": 3.12,
+        "peso_kN": 74.88
+      },
+      "muro_direccion_corta": {
+        "vol_m3": 2.13,
+        "peso_kN": 51.168
+      },
+      "tapa": {
+        "vol_m3": 4.05,
+        "peso_kN": 97.2
+      },
+      "placa_fondo": {
+        "vol_m3": 6.75,
+        "peso_kN": 162
+      },
+      "total_kN": 511.296
+    },
+    "presiones_diseno": {
+      "Ph_hidrostatica_kNm2": 44.15,
+      "Ph_ADVERTENCIA": "El valor publicado (44.15 = 9.810 x 4.50) usa 4.50m como profundidad de diseño del líquido, pese a que la Altura del tanque declarada en los datos de entrada de este mismo ejercicio es 3.00m (y el resto del ejercicio -- ratios L/HL=2.00, B/HL=1.50 -- sí usa HL=3.00m de forma consistente). Es una inconsistencia real de la fuente (tesis), no un error de transcripción de este caso de prueba: 9.810x3.00=29.43 (consistente con el resto del ejercicio) mientras que 9.810x4.50=44.145~44.15 (el valor efectivamente publicado). Se documentan ambos valores; se recomienda no usar Ph de este ejercicio como oráculo hasta aclarar la discrepancia -- las demás cantidades (Ka, Ps2, fuerza sísmica, Mononobe-Okabe) sí son fiables porque usan HL=3.00m de forma consistente.",
+      "Ph_si_HL_3_00m_consistente_con_resto_del_ejercicio": 29.43,
+      "Ka": 0.2818,
+      "Ps2_suelo_kNm2": 15.21
+    },
+    "fuerza_sismica_hidrodinamica_muro_longitudinal": {
+      "nota": "Dirección del sismo perpendicular al muro largo (usa L=6.00m como dimensión en dirección del sismo, DIMENSIÓN EXTERIOR -- convención de la tesis/programa original); condición EBP (excluding base pressure). OBSOLETO como oráculo numérico desde 2026-08-31: Tanque.Core usa el CLARO INTERIOR (L-2·em) para la masa de líquido de Housner (ACI 350.3 'inside dimensions'), por lo que Wi/Wc/Pi/Pc y presiones aquí publicadas NO coinciden con el cálculo actual (ver FuerzaSismicaHidrodinamica.cs).",
+      "Wi_peso_impulsivo_kN": 430.93,
+      "Wc_peso_convectivo_kN": 385.4,
+      "L_HL": 2.0,
+      "hi_altura_centroide_impulsivo_m": 1.13,
+      "hc_altura_centroide_convectivo_m": 1.75,
+      "mw_masa_muro": 1.47,
+      "mi_masa_impulsiva_muro": 4.88,
+      "h_centroide_sistema_impulsivo_m": 1.21,
+      "Ec_MPa": 24870.06,
+      "k_rigidez_muro_kPa": 27958.74,
+      "Ti_periodo_impulsivo_s": 0.0947,
+      "lambda_factor_periodo_convectivo": 5.34,
+      "Tc_periodo_convectivo_s": 2.88,
+      "epsilon_coef_masa_efectiva": 0.843,
+      "espectro_diseno": {
+        "Sds": 0.65,
+        "S1": 0.48,
+        "Ts": 0.7385,
+        "Ci": 0.65,
+        "Cc": 0.19,
+        "I": 1.25,
+        "Ri": 3.0,
+        "Rc": 1.0
+      },
+      "fuerzas_diseno_kN": {
+        "Pw_inercial_muro": 17.76,
+        "Pr_sobrecarga_cubierta": 26.33,
+        "Pi_impulsiva": 116.71,
+        "Pc_convectiva": 90.35
+      },
+      "presiones_kNm2": {
+        "impulsiva_fondo": 7.56,
+        "impulsiva_superficie": 1.08,
+        "convectiva_fondo": 1.67,
+        "convectiva_superficie": 5.02,
+        "inercial_muro_distribuida": 1.32
+      },
+      "aceleracion_vertical": {
+        "Sd_vertical_o_similar": 0.073,
+        "sobrecarga_kNm2": 2.14
+      }
+    },
+    "fuerza_sismica_hidrodinamica_muro_transversal_tabla38": {
+      "nota": "Dirección del sismo perpendicular al muro corto (usa B=4.50m, DIMENSIÓN EXTERIOR -- convención de la tesis/programa original); mismo procedimiento, resumen completo publicado en Tabla 38. OBSOLETO como oráculo numérico desde 2026-08-31: Tanque.Core usa el CLARO INTERIOR (B-2·em) para la masa de líquido de Housner (ACI 350.3 'inside dimensions'), por lo que los valores aquí publicados NO coinciden con el cálculo actual.",
+      "Wi_peso_impulsivo_kN": 526.97,
+      "Wc_peso_convectivo_kN": 305.49,
+      "L_HL": 1.5,
+      "hi_m": 1.13,
+      "hc_m": 1.88,
+      "mw": 1.47,
+      "mi": 4.48,
+      "h_centroide_m": 1.21,
+      "Ec_MPa": 24870,
+      "k_kPa": 27554,
+      "Ti_s": 0.0923,
+      "lambda_factor": 5.49,
+      "Tc_s": 2.43,
+      "epsilon": 0.85,
+      "Sds": 0.65,
+      "S1": 0.48,
+      "Ts_periodo_ultimo_s": 0.74,
+      "Ci_coef_impulsiva": 0.65,
+      "Cc_coef_convectiva": 0.26,
+      "coef_carga_acel_vertical": 0.26,
+      "I": 1.0,
+      "Ri": 3.0,
+      "Rc": 1.0,
+      "Pw_kN": 12.92,
+      "Pr_kN": 26.33,
+      "Pi_kN": 142.72,
+      "Pc_kN": 100.92,
+      "presiones_kNm2": {
+        "impulsiva_fondo": 6.94,
+        "impulsiva_superficie": 0.99,
+        "convectiva_fondo": 0.65,
+        "convectiva_superficie": 4.96,
+        "inercial_muro_distribuida": 0.72
+      },
+      "aceleracion_vertical": {
+        "factor": 0.073,
+        "sobrecarga_kNm2": 2.14
+      },
+      "NOTA_INCONSISTENCIA_I": "La Tabla 38 reporta I=1.00 para el muro transversal, mientras que el cálculo del muro longitudinal (mismo proyecto, misma categoría de uso) usa I=1.25. Es una inconsistencia de la fuente entre ambas tablas (probable errata de transcripción de la tesis, ya que la categoría de uso del proyecto es única); se transcribe literalmente el valor publicado en cada tabla sin corregir."
+    },
+    "presion_dinamica_suelo_mononobe_okabe_tabla39": {
+      "datos_entrada": {
+        "gamma_suelo_kNm3": 18,
+        "Aa": 0.2,
+        "phi_grados": 28,
+        "alpha_i_grados": 0,
+        "beta_grados": 90,
+        "delta_grados": 0,
+        "kh": 0.2,
+        "kv": 0.0
+      },
+      "theta_grados": 11.31,
+      "psi": 2.28,
+      "Kae": 0.4193,
+      "Ka": 0.2818,
+      "Keq": 0.1376,
+      "Qae_kNm2": 7.43,
+      "cita_metodo": "Matiz Chica, Jorge Iván. Método simplificado para el análisis y diseño de tanques rectangulares en concreto reforzado a partir de la formulación de los elementos finitos. Tesis de maestría, Universidad Nacional de Colombia, 2011, p.164 -- fuente citada por la tesis del programa para el paso Keq=Kae-Ka."
+    },
+    "comparativa_cortante_basal_kN": {
+      "metodo_ACI350_3_ec_5_32": 491.92,
+      "metodo_NSR10_ec_A_4_3_1": 365.57,
+      "conclusion": "La carga sísmica calculada con el método de ACI 350.3 (Housner) es mayor que la exigida por NSR-10 A.4.3-1 -- el diseño resultante queda del lado conservador."
+    },
+    "combinaciones_carga_tabla40": {
+      "condicion_1_presion_interna": [
+        "B.2.4-1",
+        "B.2.4-6 (con sismo hidrodinámico)",
+        "B.2.4-7 (con sismo hidrodinámico)"
+      ],
+      "condicion_2_presion_externa": [
+        "B.2.4-2",
+        "B.2.4-6 (con presión dinámica de suelo)",
+        "B.2.4-7 (con presión dinámica de suelo)"
+      ],
+      "condicion_3_gravitacional": [
+        "B.2.4-1",
+        "B.2.4-2",
+        "B.2.4-3",
+        "B.2.4-4"
+      ],
+      "nota": "A diferencia del Ejercicio 1, la condición 3 aquí es gravitacional (para diseño de cimentación y tapa), no de flotación -- el tanque tiene tapa y no se reportó nivel freático."
+    },
+    "diseno": {
+      "cortante_tabla71": {
+        "muro_longitudinal": {
+          "Vu_kN": 85.72,
+          "Vc_kN": 101.2,
+          "cumple": true
+        },
+        "muro_transversal": {
+          "Vu_kN": 82.22,
+          "Vc_kN": 101.2,
+          "cumple": true
+        },
+        "placa_cubierta_tapa": {
+          "Vu_kN": 28.32,
+          "Vc_kN": 67.46,
+          "cumple": true
+        },
+        "placa_fondo": {
+          "Vu_kN": 83.86,
+          "Vc_kN": 118.06,
+          "cumple": true
+        }
+      },
+      "flexion_inicial_muros_tabla72": [
+        {
+          "muro": "Longitudinal",
+          "Mu_kNm": 36.53,
+          "refuerzo": "Horizontal",
+          "rho": 0.01075,
+          "As_mm2": 1071.68,
+          "varilla": "#6 (284mm2)",
+          "espaciamiento_m": 0.2
+        },
+        {
+          "muro": "Longitudinal",
+          "Mu_kNm": 28.2,
+          "refuerzo": "Vertical",
+          "rho": 0.00807,
+          "As_mm2": 807.1,
+          "varilla": "#4 (129mm2)",
+          "espaciamiento_m": 0.13
+        },
+        {
+          "muro": "Transversal",
+          "Mu_kNm": 36.53,
+          "refuerzo": "Horizontal",
+          "rho": 0.01075,
+          "As_mm2": 1071.68,
+          "varilla": "#6 (284mm2)",
+          "espaciamiento_m": 0.2
+        },
+        {
+          "muro": "Transversal",
+          "Mu_kNm": 19.06,
+          "refuerzo": "Vertical",
+          "rho": 0.0053,
+          "As_mm2": 807.1,
+          "varilla": "#4 (129mm2)",
+          "espaciamiento_m": 0.2
+        }
+      ],
+      "flexion_inicial_placas_tabla73": [
+        {
+          "placa": "Tapa",
+          "Mu_kNm": 16.85,
+          "refuerzo": "Longitudinal",
+          "rho": 0.00862,
+          "As_mm2": 646.2,
+          "varilla": "#5 (199mm2)",
+          "espaciamiento_m": 0.2
+        },
+        {
+          "placa": "Tapa",
+          "Mu_kNm": 11.98,
+          "refuerzo": "Transversal",
+          "rho": 0.00597,
+          "As_mm2": 447.62,
+          "varilla": "#4 (129mm2)",
+          "espaciamiento_m": 0.2
+        },
+        {
+          "placa": "Fondo cara superior",
+          "Mu_kNm": 36.16,
+          "refuerzo": "Longitudinal",
+          "rho": 0.0033,
+          "As_mm2": 583.33,
+          "varilla": "#4 (129mm2)",
+          "espaciamiento_m": 0.17
+        },
+        {
+          "placa": "Fondo cara superior",
+          "Mu_kNm": 50.89,
+          "refuerzo": "Transversal",
+          "rho": 0.0046,
+          "As_mm2": 803.94,
+          "varilla": "#4 (129mm2)",
+          "espaciamiento_m": 0.13
+        },
+        {
+          "placa": "Fondo cara inferior",
+          "Mu_kNm": 34.82,
+          "refuerzo": "Longitudinal",
+          "rho": 0.0033,
+          "As_mm2": 583.83,
+          "varilla": "#4 (129mm2)",
+          "espaciamiento_m": 0.17
+        },
+        {
+          "placa": "Fondo cara inferior",
+          "Mu_kNm": 34.82,
+          "refuerzo": "Transversal",
+          "rho": 0.0033,
+          "As_mm2": 583.83,
+          "varilla": "#4 (129mm2)",
+          "espaciamiento_m": 0.17
+        }
+      ],
+      "revision_Sd_placa_cubierta_tabla74": {
+        "columnas": [
+          "Longitudinal",
+          "Transversal"
+        ],
+        "Es_MPa": [
+          200000,
+          200000
+        ],
+        "Ec_MPa": [
+          24870,
+          24870
+        ],
+        "n": [
+          8.04,
+          8.04
+        ],
+        "rho": [
+          0.0086,
+          0.00597
+        ],
+        "k": [
+          0.3094,
+          0.2656
+        ],
+        "j": [
+          0.8969,
+          0.9115
+        ],
+        "d_mm": [
+          75,
+          75
+        ],
+        "As_mm2": [
+          796,
+          516
+        ],
+        "S_mm": [
+          200,
+          200
+        ],
+        "Mu_kNm": [
+          16.85,
+          11.98
+        ],
+        "Ms_kNm": [
+          12.04,
+          8.56
+        ],
+        "fs_MPa": [
+          224.79,
+          242.59
+        ],
+        "fsadm_MPa": [
+          179.02,
+          179.02
+        ],
+        "requiere_rediseno": [
+          true,
+          true
+        ],
+        "AsR_mm2": [
+          999.49,
+          699.22
+        ],
+        "rho_nuevo": [
+          0.0133,
+          0.00932
+        ],
+        "k_nuevo": [
+          0.368,
+          0.31945
+        ],
+        "j_nuevo": [
+          0.8773,
+          0.8935
+        ],
+        "S_nueva_mm": [
+          114.31,
+          155.756
+        ],
+        "fs_nuevo_MPa": [
+          183.01,
+          182.62
+        ],
+        "fsadm_recalculado_MPa": [
+          249.26,
+          211.416
+        ],
+        "gamma": [
+          1.4,
+          1.4
+        ],
+        "Sd": [
+          1.48,
+          1.48
+        ]
+      },
+      "revision_Sd_placa_fondo_tabla75": {
+        "columnas": [
+          "CaraSuperior_Longitudinal",
+          "CaraSuperior_Transversal",
+          "CaraInferior_Longitudinal",
+          "CaraInferior_Transversal"
+        ],
+        "Es_MPa": [
+          200000,
+          200000,
+          200000,
+          200000
+        ],
+        "Ec_MPa": [
+          24870,
+          24870,
+          24870,
+          24870
+        ],
+        "n": [
+          8.04,
+          8.04,
+          8.04,
+          8.04
+        ],
+        "rho": [
+          0.0033,
+          0.0033,
+          0.0033,
+          0.0033
+        ],
+        "k": [
+          0.2054,
+          0.2054,
+          0.2054,
+          0.2054
+        ],
+        "j": [
+          0.9315,
+          0.9315,
+          0.9315,
+          0.9315
+        ],
+        "d_mm": [
+          175,
+          175,
+          175,
+          175
+        ],
+        "As_mm2": [
+          645,
+          903,
+          645,
+          645
+        ],
+        "S_mm": [
+          167,
+          125,
+          167,
+          167
+        ],
+        "Mu_kNm": [
+          36.16,
+          50.89,
+          10.73,
+          7.74
+        ],
+        "Ms_kNm": [
+          25.83,
+          36.35,
+          7.66,
+          5.53
+        ],
+        "fs_MPa": [
+          245.64,
+          246.93,
+          72.89,
+          52.58
+        ],
+        "fsadm_MPa": [
+          202.67,
+          238.84,
+          202.67,
+          202.67
+        ],
+        "requiere_rediseno": [
+          true,
+          true,
+          false,
+          false
+        ],
+        "AsR_mm2": [
+          781.77,
+          933.57,
+          645,
+          645
+        ],
+        "rho_nuevo": [
+          0.0045,
+          0.0053,
+          0.0033,
+          0.0033
+        ],
+        "k_nuevo": [
+          0.2345,
+          0.2531,
+          0.2054,
+          0.2054
+        ],
+        "j_nuevo": [
+          0.9218,
+          0.9156,
+          0.9315,
+          0.9315
+        ],
+        "S_nueva_mm": [
+          141.64,
+          121.4,
+          167,
+          167
+        ],
+        "fs_nuevo_MPa": [
+          204.8,
+          243.0,
+          72.89,
+          52.58
+        ],
+        "fsadm_recalculado_MPa": [
+          223.51,
+          242.31,
+          202.67,
+          202.67
+        ],
+        "gamma": [
+          1.4,
+          1.4,
+          1.4,
+          1.4
+        ],
+        "Sd": [
+          1.32,
+          1.11,
+          3.7,
+          5.14
+        ]
+      },
+      "resumen_final_tabla76": [
+        {
+          "elemento": "Muro Longitudinal",
+          "sector": "Todo el muro",
+          "sentido": "Vertical",
+          "refuerzo": "#4 c/0.13m"
+        },
+        {
+          "elemento": "Muro Longitudinal",
+          "sector": "Todo el muro",
+          "sentido": "Horizontal",
+          "refuerzo": "#6 c/0.20m"
+        },
+        {
+          "elemento": "Muros-Cara Interna",
+          "sector": "Todo el muro",
+          "sentido": "Vertical",
+          "refuerzo": "#4 c/0.20m"
+        },
+        {
+          "elemento": "Muros-Cara Interna",
+          "sector": "Todo el muro",
+          "sentido": "Horizontal",
+          "refuerzo": "#6 c/0.20m"
+        },
+        {
+          "elemento": "Placa de cubierta o tapa",
+          "sector": "Toda la placa",
+          "sentido": "Transversal",
+          "refuerzo": "#4 c/0.11m"
+        },
+        {
+          "elemento": "Placa de cubierta o tapa",
+          "sector": "Toda la placa",
+          "sentido": "Longitudinal",
+          "refuerzo": "#4 c/0.15m"
+        },
+        {
+          "elemento": "Placa de Fondo",
+          "sector": "Cara superior",
+          "sentido": "Transversal",
+          "refuerzo": "#4 c/0.12m"
+        },
+        {
+          "elemento": "Placa de Fondo",
+          "sector": "Cara superior",
+          "sentido": "Longitudinal",
+          "refuerzo": "#4 c/0.14m"
+        },
+        {
+          "elemento": "Placa de Fondo",
+          "sector": "Cara Inferior",
+          "sentido": "Transversal",
+          "refuerzo": "#4 c/0.17m"
+        },
+        {
+          "elemento": "Placa de Fondo",
+          "sector": "Cara Inferior",
+          "sentido": "Longitudinal",
+          "refuerzo": "#4 c/0.17m"
+        }
+      ]
+    },
+    "peso_tanque_kN": {
+      "Pm1_par_muros_direccion_corta_B_kN": 51.168,
+      "Pm2_par_muros_direccion_larga_L_kN": 74.88,
+      "tapa_kN": 162.0,
+      "placa_fondo_kN": 97.2,
+      "total": 511.296,
+      "_verificacion_esta_sesion": "Añadido esta sesión (no estaba en la versión anterior de este archivo). Coincide exactamente con la Tabla 36 de la tesis (p.106) aplicando la fórmula confirmada por IL: Pm1=(Ht-ef-et)*(B-2em)*em*Dc=51.168, Pm2=(Ht-ef-et)*L*em*Dc=74.88 (ambos byte-exacto contra la tabla). NOTA: las etiquetas de fila de la Tabla 36 de la tesis para 'Tapa del tanque' (Vol=4.05, W=97.2) y 'Placa de fondo' (Vol=6.75, W=162) están intercambiadas respecto a la asignación correcta de variables: el valor Vol=4.05/W=97.2 usa ef=0.15 (espesor de FONDO, sección 8.2.1.2 de la tesis) y por tanto es Pf, no Pt; el valor Vol=6.75/W=162 usa et=0.25 (espesor de TAPA, sección 8.2.1.3) y por tanto es Pt, no Pf. Es un error de rotulado de la tabla publicada, no de la fórmula ni del programa -- el total (511.296) es correcto en ambos casos porque la suma no depende del orden de las etiquetas. Se reportan aquí con las etiquetas corregidas."
+    }
+  },
+  "notas_verificacion": [
+    "Este ejercicio NO incluye las tablas completas de coeficientes de corte/deflexión/momento de los muros (Tablas 41-70 de la tesis, ~30 páginas) -- se referencian pero no se transcriben en este caso de prueba por alcance; su transcripción queda pendiente junto con la extracción de las tablas PCA/Marcus a JSON documentada en el Anexo B de Fase0_Especificacion_Normativa.docx.",
+    "Se confirma, con datos de entrada distintos a los usados en la verificación IL de Suelo_Dinamico.il, que Ka=(1-sinφ)/(1+cosφ) (el hallazgo 1 anómalo) es el valor efectivamente usado también en el desarrollo de este ejercicio (Ka=0.2818 coincide con la fórmula anómala, no con Rankine clásico=(1-sin28)/(1+sen28)=0.3610)."
+  ]
+}
