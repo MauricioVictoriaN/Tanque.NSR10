@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Obfuscar Tanque.Core.dll (motor de calculo) manteniendo la API publica -->
+<Obfuscator>
+  <Var name="InPath" value="." />
+  <Var name="OutPath" value="Obfuscated" />
+  <Var name="KeepPublicApi" value="true" />
+  <Var name="KeepPublicNamespaces" value="true" />
+  <Var name="RenameTypes" value="true" />
+  <Var name="RenameMethods" value="true" />
+  <Var name="RenameProperties" value="true" />
+  <Var name="RenameFields" value="true" />
+  <Var name="HideStrings" value="false" />
+  <Var name="Logging" value="true"/>
+  <Module file="$(InPath)\Tanque.Core.dll" />
+</Obfuscator>
