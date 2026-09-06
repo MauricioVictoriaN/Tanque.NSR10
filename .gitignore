@@ -1,0 +1,18 @@
+# Build output
+bin/
+obj/
+*.user
+*.pdb
+.vs/
+.history/
+
+# Tooling heavy/generado
+tools/OCR_PCA/lib/
+node_modules/
+
+# El nucleo OFUSCADO en libs/ SI se versiona (es parte de la distribucion publica)
+!libs/
+!libs/Tanque.Core.dll
+
+# Assets de EngrXiv / borradores
+*.bak
