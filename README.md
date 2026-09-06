@@ -32,7 +32,7 @@
 
 ## Download & usage
 
-The program is distributed **free of charge** for academic and research use. Releases are available at https://github.com/MauricioVictoriaN/Tanque.NSR10/releases. Each release provides a compiled **Windows application**, the packaged **calculation core** and example projects.
+The program is distributed **free of charge** for academic and research use. Releases are available at https://github.com/MauricioVictoriaN/Tanque.NSR10/releases. Each release provides a compiled **Windows application** and the packaged **calculation core**.
 
 > The calculation core (`Tanque.Core`) is distributed as a **compiled, obfuscated binary**. Its source is not public.
 
@@ -58,7 +58,7 @@ This project is released under a **tiered license**:
 |---|---|
 | Accessible source (application, documentation, examples, test data, verification suite, tests) | **CC BY-NC-SA 4.0** (attribution, non-commercial, share-alike) |
 | Calculation core (`Tanque.Core`) | **Proprietary academic binary** — commercial use, reverse engineering and modification are **prohibited** |
-| Preprint (manuscript) | **CC BY 4.0** |
+| Manuscript (engrXiv, published) | **CC BY 4.0** |
 
 See [LICENSE](LICENSE) and [DISCLAIMER_AND_EULA.md](DISCLAIMER_AND_EULA.md) for the full Disclaimer of warranty and Terms of Use (EULA).
 
