@@ -2,11 +2,11 @@
 
 **Analysis and design tool for rectangular reinforced-concrete tanks under NSR-10, ACI 350.3 and the PCA manual.**
 
-*Tanque.NSR10* is an academic software prototype that automates the analysis and design of rectangular reinforced-concrete water tanks. It solves the interaction between a long wall, a short wall and the base / cover slabs using the tabulated moment coefficients of the PCA *Rectangular Concrete Tanks* manual, the Colombian earthquake-resistant code **NSR-10 (Título C)** and **ACI 350.3** (seismic hydrodynamic effects). It is the software companion to a manuscript in preparation for submission to **engrXiv** (a preprint archive).
+*Tanque.NSR10* is an academic software prototype that automates the analysis and design of rectangular reinforced-concrete water tanks. It solves the interaction between a long wall, a short wall and the base / cover slabs using the tabulated moment coefficients of the PCA *Rectangular Concrete Tanks* manual, the Colombian earthquake-resistant code **NSR-10 (Título C)** and **ACI 350.3** (seismic hydrodynamic effects). It is the software companion to the manuscript published on **engrXiv** (DOI [10.31224/8148](https://doi.org/10.31224/8148)).
 
 > **Academic / research use only.** Non-commercial. See the [LICENSE](LICENSE) and the *Disclaimer / EULA* below.
 
-[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-brightgreen)](LICENSE) · [![Manuscript: in preparation](https://img.shields.io/badge/Manuscript-in%20preparation%20(engrXiv)-purple)]() · [![GitHub](https://img.shields.io/badge/Repository-github.com-%2F-MauricioVictoriaN/Tanque.NSR10-blue)](https://github.com/MauricioVictoriaN/Tanque.NSR10)
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-brightgreen)](LICENSE) · [![Manuscript: published (engrXiv)](https://img.shields.io/badge/Manuscript-published%20(engrXiv)-blue)](https://doi.org/10.31224/8148) · [![GitHub](https://img.shields.io/badge/Repository-github.com-%2F-MauricioVictoriaN/Tanque.NSR10-blue)](https://github.com/MauricioVictoriaN/Tanque.NSR10)
 
 ---
 
@@ -72,9 +72,9 @@ This is a **research and teaching prototype**. It is **not** a substitute for pr
 
 ## Citation
 
-If you use this software, please cite the manuscript (in preparation, to be submitted to engrXiv):
+If you use this software, please cite the published manuscript on engrXiv:
 
-> Mauricio Javier Victoria Niño. *Tanque.NSR10: automated analysis and design of rectangular reinforced-concrete tanks under NSR-10, ACI 350.3 and the PCA manual.* Software companion to a manuscript in preparation for submission to **engrXiv** (2026). Repository: https://github.com/MauricioVictoriaN/Tanque.NSR10 — DOI to be assigned upon publication.
+> Mauricio Javier Victoria Niño. *Tanque.NSR10: Computational Analysis and Design of Reinforced-Concrete Rectangular Liquid-Retaining Tanks under the Colombian Code NSR-10 and ACI 350.3.* engrXiv preprint (2026). DOI: [10.31224/8148](https://doi.org/10.31224/8148). Repository: https://github.com/MauricioVictoriaN/Tanque.NSR10
 
 ---
 
